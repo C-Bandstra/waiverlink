@@ -1,13 +1,13 @@
 // import { useState } from 'react'
-import './App.css'
+import WaiverScreen from "./WaiverScreen";
 
-function App() {
+function Home() {
 
   return (
     <div className="p-4 text-center text-blue-600">
-      Hello, Tailwind!
+      <WaiverScreen />
     </div>
   );
 }
 
-export default App
+export default Home;
