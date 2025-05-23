@@ -39,7 +39,7 @@ The system is designed to be frictionless for guests, easy to manage for staff, 
 - Active demo tracking (admin)
 - Guest profile export & analytics
 
-## 🛠️ Dev Setup
+## Dev Setup
 
 ```bash
 git clone https://github.com/yourusername/waiverlink.git
