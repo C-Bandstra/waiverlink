@@ -2,12 +2,14 @@ import { useState } from 'react';
 import type {FC, FormEvent, JSX} from 'react'
 import WaiverRenderer from '../components/WaiverRenderer';
 import { parseWaiverTemplate } from '../utils/utils';
+import NeverSummer from '../seed/never-summer';
 // import { renderWaiver } from '../utils/utils';
 
 const waiverTemplate = `
   I, {{name}}, agree to the following terms.
   Please sign here: {{signature}} {{date}}
-  If under 18, parent must also sign here: {{signature}} {{date}}
+  You must also sign here: {{signature}} {{date}}
+  Board Model: {{input:boardModel}}
   By signing, I acknowledge the risks involved.
 `;
 
@@ -40,7 +42,6 @@ const WaiverScreen: FC = () => {
 
   return (
     <div className="w-full max-w-screen-sm sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto p-4">
-      <h1 className="text-2xl font-semibold mb-4">Demo Waiver Agreement</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -73,14 +74,16 @@ const WaiverScreen: FC = () => {
           </div>
         </div>
 
+        <h1 className="text-2xl font-semibold mb-4">Demo Waiver Template</h1>
         {/* Waiver Preview */}
         { name && signatureElement ? (
-            <div className="my-6 border border-black py-24">
+          <div className="my-6 border border-black py-24">
               <WaiverRenderer
                 content={parseWaiverTemplate(waiverTemplate)}
                 name={name}
                 signatureElement={signaturePlaceholder}
                 onFieldInteract={onFieldInteract}
+                seed={NeverSummer}
               />
             </div>
           ) : (
