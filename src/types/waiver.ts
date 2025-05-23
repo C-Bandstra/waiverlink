@@ -7,3 +7,15 @@ export type Waiver = {
   signature: string
   signedAt: string
 }
+
+export interface FieldDefinition {
+  render: (
+    interacted: boolean,
+    fieldId: string,
+    onClick: () => void,
+    value?: React.ReactNode,
+    setValue?: (val: string) => void,
+    subtype?: string
+  ) => React.ReactNode;
+}
+
