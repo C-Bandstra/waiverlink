@@ -28,9 +28,9 @@ The system is designed to be frictionless for guests, easy to manage for staff, 
 
 ## Current Status
 
-- 🟡 Initial scaffolding and configuration
-- 🟡 Basic waiver UI prototype
-- 🟡 Dynamic business configuration proof-of-concept
+- Initial scaffolding and configuration
+- Basic waiver UI prototype
+- Dynamic business configuration proof-of-concept
 
 ## Upcoming Features
 
