@@ -1,41 +1,33 @@
-import type { JSX } from 'react';
-import { useState } from 'react';
+type WaiverToken = { type: string; id?: string };
+type ParsedContent = (string | WaiverToken)[];
 
-export function renderWaiver(content: string, name: string, signatureElement: JSX.Element) {
+export function parseWaiverTemplate(template: string): ParsedContent {
+  //dynamic fields
+  const regex = /{{(name|signature|date)(?::(\d+))?}}/g;
 
-  const [signedIndexes, setSignedIndexes] = useState<number[]>([]);
+  const result: ParsedContent = [];
+  let lastIndex = 0;
 
-  const parts = content.split(/({{name}}|{{signature}})/g);
-  
-  const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(template)) !== null) {
+    const [fullMatch, type, id] = match;
+    const matchStart = match.index;
 
-  return (
-    <div className="space-y-2 text-left">
-      {parts.map((part, i) => {
-        if (part === '{{name}}') {
-          return <strong key={i}>{name}</strong>;
-        }
+    // Push preceding text
+    if (lastIndex < matchStart) {
+      result.push(template.slice(lastIndex, matchStart));
+    }
 
-        if (part === '{{signature}}') {
-          const isSigned = signedIndexes.includes(i);
-          return (
-            <span
-              key={i}
-              onClick={() => {
-                if (!isSigned) setSignedIndexes([...signedIndexes, i]);
-              }}
-              className="inline-block min-w-[150px] border-b border-gray-500 text-gray-400 italic cursor-pointer"
-            >
-              {isSigned ? signatureElement : 'Click to sign'}
-            </span>
-          );
-        }
-        if (part === '{{date}}') {
-          
-        }
+    // Push token
+    result.push({ type, id });
 
-        return <span key={i}>{part}</span>;
-      })}
-    </div>
-  );
+    lastIndex = match.index + fullMatch.length;
+  }
+
+  // Push remaining text
+  if (lastIndex < template.length) {
+    result.push(template.slice(lastIndex));
+  }
+
+  return result;
 }

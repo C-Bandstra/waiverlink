@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type {FC, FormEvent, JSX} from 'react'
 import WaiverRenderer from '../components/WaiverRenderer';
+import { parseWaiverTemplate } from '../utils/utils';
 // import { renderWaiver } from '../utils/utils';
 
 const waiverTemplate = `
@@ -18,8 +19,10 @@ const WaiverScreen: FC = () => {
   const [agreed, setAgreed] = useState<boolean>(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  const onFieldInteract = (fieldName: string, index: number) => {
-    setTouched(prev => ({ ...prev, [`${fieldName}-${index}`]: true }));
+  const onFieldInteract = (_fieldName: string, fieldId: string) => {
+    // fieldName: string ex:"signature" || "date" used for tracking all of a specific group
+    console.log("FIELD ID: ", fieldId)
+    setTouched(prev => ({ ...prev, [`${fieldId}`]: true }));
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -33,7 +36,7 @@ const WaiverScreen: FC = () => {
     });
   };
 
-  const isFormValid = name.trim() !== '' && agreed;
+  const isFormValid = name && agreed;
 
   return (
     <div className="w-full max-w-screen-sm sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto p-4">
@@ -74,7 +77,7 @@ const WaiverScreen: FC = () => {
         { name && signatureElement ? (
             <div className="my-6 border border-black py-24">
               <WaiverRenderer
-                content={waiverTemplate}
+                content={parseWaiverTemplate(waiverTemplate)}
                 name={name}
                 signatureElement={signaturePlaceholder}
                 onFieldInteract={onFieldInteract}

@@ -1,64 +1,75 @@
 import React, { useState } from 'react';
 
-interface WaiverRendererProps {
-  content: string;
-  name: string;
-  signatureElement: React.JSX.Element;
-  onFieldInteract: (fieldName: string, i: number) => void;
+interface WaiverToken {
+  type: string;
 }
 
-export default function WaiverRenderer({ content, name, signatureElement, onFieldInteract }: WaiverRendererProps) {
-  const [signedIndexes, setSignedIndexes] = useState<number[]>([]);
+interface WaiverRendererProps {
+  content: (string | WaiverToken)[];
+  name: string;
+  signatureElement: React.JSX.Element;
+  onFieldInteract: (fieldName: string, fieldId: string) => void;
+}
 
-  const parts = content.split(/({{name}}|{{signature}}|{{date}})/g);
+export default function WaiverRenderer({
+  content,
+  name,
+  signatureElement,
+  onFieldInteract,
+}: WaiverRendererProps) {
+  const [interactions, setInteractions] = useState<Record<string, boolean>>({});
+  const fieldCounters: Record<string, number> = {};
   const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-  console.log(signedIndexes)
+  const handleFieldClick = (type: string, fieldId: string) => {
+    if (!interactions[fieldId]) {
+      setInteractions((prev) => ({ ...prev, [fieldId]: true }));
+      onFieldInteract(type, fieldId);
+    }
+  };
 
   return (
     <div className="space-y-2 text-left">
-      {parts.map((part, i) => {
-        if (part === '{{name}}') {
-          return <strong key={i}>{name}</strong>;
-        }
+      {content.map((chunk, index) => {
+        if (typeof chunk === 'string') return <span key={index}>{chunk}</span>;
 
-        if (part === '{{signature}}') {
-          const isSigned = signedIndexes.includes(i);
-          return (
-            <span
-              key={i}
-              onClick={() => {
-                if (!isSigned) {
-                  setSignedIndexes([...signedIndexes, i]);
-                  onFieldInteract('signature', i);
-                }
-              }}
-              className="inline-block min-w-[150px] border-b border-gray-500 text-gray-400 italic cursor-pointer"
-            >
-              {isSigned ? signatureElement : 'Click to sign'}
-            </span>
-          );
-        }
+        const count = (fieldCounters[chunk.type] = (fieldCounters[chunk.type] || 0) + 1);
+        const fieldId = `${chunk.type}-${count}`;
+        const interacted = interactions[fieldId];
 
-        if (part === '{{date}}') {
-          const isDated = signedIndexes.includes(i);
-          return (
-            <span
-              key={i}
-              onClick={() => {
-                if (!isDated) {
-                  setSignedIndexes([...signedIndexes, i]);
-                  onFieldInteract('date', i);
-                }
-              }}
-              className="inline-block min-w-[150px] border-b border-gray-500 text-gray-400 italic cursor-pointer"
-            >
-              {isDated ? currentDate : 'Click to date'}
-            </span>
-          );
-        }
+        switch (chunk.type) {
+          case 'signature':
+            return (
+              <span
+                key={index}
+                onClick={() => handleFieldClick('signature', fieldId)}
+                className="inline-block min-w-[150px] border-b border-gray-500 text-gray-400 italic cursor-pointer"
+              >
+                {interacted ? signatureElement : 'Click to sign'}
+              </span>
+            );
 
-        return <span key={i}>{part}</span>;
+          case 'name':
+            return <strong key={index}>{name}</strong>;
+
+          case 'date':
+            return (
+              <span
+                key={index}
+                onClick={() => handleFieldClick('date', fieldId)}
+                className="inline-block min-w-[150px] border-b border-gray-500 text-gray-400 italic cursor-pointer"
+              >
+                {interacted ? currentDate : 'Click to date'}
+              </span>
+            );
+
+          default:
+            return (
+              <span key={index} className="text-red-500 italic">
+                [Unknown field: {chunk.type}]
+              </span>
+            );
+        }
       })}
     </div>
   );
