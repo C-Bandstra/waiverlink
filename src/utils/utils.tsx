@@ -1,33 +1,37 @@
-type WaiverToken = { type: string; id?: string };
+type WaiverToken = {
+  type: string;        // e.g., "name", "signature", "date", "input"
+  id?: string;         // optional subtype or identifier (e.g., "boardModel")
+};
+
 type ParsedContent = (string | WaiverToken)[];
 
+
 export function parseWaiverTemplate(template: string): ParsedContent {
-  //dynamic fields
-  const regex = /{{(name|signature|date)(?::(\d+))?}}/g;
+  const regex = /{{(name|signature|date|input)(?::([\w-]+))?}}/g;
 
   const result: ParsedContent = [];
   let lastIndex = 0;
 
   let match: RegExpExecArray | null;
   while ((match = regex.exec(template)) !== null) {
-    const [fullMatch, type, id] = match;
+    // match[1] = type, match[2] = id/subtype
+    const type = match[1];
+    const id = match[2];
     const matchStart = match.index;
 
-    // Push preceding text
     if (lastIndex < matchStart) {
       result.push(template.slice(lastIndex, matchStart));
     }
 
-    // Push token
     result.push({ type, id });
 
-    lastIndex = match.index + fullMatch.length;
+    lastIndex = regex.lastIndex;
   }
 
-  // Push remaining text
   if (lastIndex < template.length) {
     result.push(template.slice(lastIndex));
   }
 
   return result;
 }
+
