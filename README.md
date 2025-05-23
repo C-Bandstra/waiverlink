@@ -4,7 +4,7 @@
 
 The system is designed to be frictionless for guests, easy to manage for staff, and deeply extensible for tracking, analytics, and potential customer conversion.
 
-## 🚀 Goals
+## Goals
 
 - Minimal input required from end-users (like signing a paper waiver)
 - Guest-first flow with no login required
@@ -12,13 +12,13 @@ The system is designed to be frictionless for guests, easy to manage for staff, 
 - Reusable and dynamic data structures for multiple industries
 - Lightweight admin interface for real-time tracking and management
 
-## 🧱 Tech Stack
+## Tech Stack
 
 - **Frontend:** React (Vite) + TypeScript + TailwindCSS
-- **Backend:** Firebase (Auth + Firestore)
+- **Backend:** Firebase (Auth + Firestore) Future Scalability - MySQL, Express
 - **Hosting:** Vercel or Firebase Hosting (TBD)
 
-## 🗺️ Structure (Planned)
+## Structure (Planned)
 
 - `/components` – Reusable UI elements  
 - `/features` – Waiver flow, admin dashboard, guest tracking  
@@ -26,13 +26,13 @@ The system is designed to be frictionless for guests, easy to manage for staff, 
 - `/types` – App-wide TypeScript models  
 - `/pages` – Route-based pages (if using Next/Vite SPA)
 
-## 🧪 Current Status
+## Current Status
 
 - 🟡 Initial scaffolding and configuration
 - 🟡 Basic waiver UI prototype
 - 🟡 Dynamic business configuration proof-of-concept
 
-## 🔜 Upcoming Features
+## Upcoming Features
 
 - Signature capture
 - Database write on submit
