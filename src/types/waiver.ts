@@ -8,14 +8,20 @@ export type Waiver = {
   signedAt: string
 }
 
+export interface WaiverToken {
+  type: string;
+  id: number;
+  subtype?: string | null;
+}
+
 export interface FieldDefinition {
   render: (
     interacted: boolean,
     fieldId: string,
     onClick: () => void,
-    value?: React.ReactNode,
+    value?: string | React.ReactNode,
     setValue?: (val: string) => void,
-    subtype?: string
+    subtype?: string | null
   ) => React.ReactNode;
 }
 
