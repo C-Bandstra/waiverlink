@@ -1,40 +1,50 @@
 import { useState } from 'react';
-import type {FC, FormEvent, JSX} from 'react'
+import type { FC, FormEvent, JSX } from 'react';
 import WaiverRenderer from '../components/WaiverRenderer';
 import { parseWaiverTemplate } from '../utils/utils';
 import NeverSummer from '../seed/never-summer';
-// import { renderWaiver } from '../utils/utils';
 
 const waiverTemplate = `
-  I, {{name}}, agree to the following terms.
-  Please sign here: {{signature}} {{date}}
-  You must also sign here: {{signature}} {{date}}
+  I, {{name}}, agree to the terms of this agreement.
   Board Model: {{input:boardModel}}
+  If you are under the age of 18, please complete the following:
+  I am under the age of 18 and my legal parent or guardian agrees to the terms stated in the waiver above.
+  My birth date: {{date:birthDate}}
+  Name of legal parent or guardian: {{input:guardian}}
+  Optional text: {{input:optional}}
+  Please sign and date here: {{signature}} {{date:current}}
   By signing, I acknowledge the risks involved.
 `;
 
-const signaturePlaceholder = <span className="font-cursive text-xl italic text-gray-700">Charlie Bandstra</span>
+const signaturePlaceholder = <span className="font-cursive text-xl italic text-gray-700">Charlie Bandstra</span>;
 
 const WaiverScreen: FC = () => {
   const [name, setName] = useState<string>('');
   const [signatureElement, setSignatureElement] = useState<JSX.Element | null>(null);
   const [agreed, setAgreed] = useState<boolean>(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [fieldValues, setFieldValues] = useState<Record<string, string | React.ReactNode>>({});
 
   const onFieldInteract = (_fieldName: string, fieldId: string) => {
-    // fieldName: string ex:"signature" || "date" used for tracking all of a specific group
-    console.log("FIELD ID: ", fieldId)
-    setTouched(prev => ({ ...prev, [`${fieldId}`]: true }));
+    console.log("FIELD ID: ", fieldId);
+    setTouched((prev) => ({ ...prev, [`${fieldId}`]: true }));
+  };
+
+  const onFieldValueChange = (fieldId: string, value: string | React.ReactNode) => {
+    setFieldValues((prev) => ({ ...prev, [fieldId]: value }));
   };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    // TODO: Replace this with DB write
     console.log('Waiver submitted:', {
       name,
       timestamp: new Date().toISOString(),
-      touched
+      touched,
+      values: {
+        ...fieldValues,
+        name,
+      },
     });
   };
 
@@ -42,7 +52,6 @@ const WaiverScreen: FC = () => {
 
   return (
     <div className="w-full max-w-screen-sm sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto p-4">
-
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -75,24 +84,24 @@ const WaiverScreen: FC = () => {
         </div>
 
         <h1 className="text-2xl font-semibold mb-4">Demo Waiver Template</h1>
-        {/* Waiver Preview */}
-        { name && signatureElement ? (
+        {name && signatureElement ? (
           <div className="my-6 border border-black py-24">
-              <WaiverRenderer
-                content={parseWaiverTemplate(waiverTemplate)}
-                name={name}
-                signatureElement={signaturePlaceholder}
-                onFieldInteract={onFieldInteract}
-                seed={NeverSummer}
-              />
-            </div>
-          ) : (
-            <p className="italic mt-4 text-2xl py-24 underline text-red-500">
-              Please enter your name and signature to view the waiver.
-            </p>
+            <WaiverRenderer
+              content={parseWaiverTemplate(waiverTemplate)}
+              name={name}
+              signatureElement={signaturePlaceholder}
+              onFieldInteract={onFieldInteract}
+              onFieldValueChange={onFieldValueChange}
+              seed={NeverSummer}
+            />
+          </div>
+        ) : (
+          <p className="italic mt-4 text-2xl py-24 underline text-red-500">
+            Please enter your name and signature to view the waiver.
+          </p>
         )}
 
-        {name && signatureElement && 
+        {name && signatureElement && (
           <div className="flex items-start space-x-2">
             <input
               id="agree"
@@ -105,7 +114,7 @@ const WaiverScreen: FC = () => {
               I agree to the demo waiver terms and consent to sign electronically.
             </label>
           </div>
-        }
+        )}
 
         <button
           type="submit"
