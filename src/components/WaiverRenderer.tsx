@@ -1,21 +1,6 @@
 import React, { useState, useCallback } from 'react';
 
-interface WaiverToken {
-  type: string;
-  id: number;
-  subtype?: string | null;
-}
-
-interface FieldDefinition {
-  render: (
-    interacted: boolean,
-    fieldId: string,
-    onClick: () => void,
-    value?: string | React.ReactNode,
-    setValue?: (val: string) => void,
-    subtype?: string | null
-  ) => React.ReactNode;
-}
+import type { WaiverToken, FieldDefinition } from '../types/waiver';
 
 interface SeedData {
   fieldDefinitions: Record<string, FieldDefinition>;
