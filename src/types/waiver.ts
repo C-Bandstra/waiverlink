@@ -9,9 +9,9 @@ export type Waiver = {
 }
 
 export interface WaiverToken {
-  type: string;
-  id: number;
-  subtype?: string | null;
+  type: string; // e.g., "name", "signature", "date", "input"
+  id: number;  // count of this type in the waiver string (1-based)
+  subtype?: string | null;  // optional subtype or identifier (e.g., "boardModel")
 }
 
 export interface FieldDefinition {
