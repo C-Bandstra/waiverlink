@@ -5,7 +5,6 @@ The system is designed to be frictionless for guests, easy to manage for staff, 
 
 ## Goals
 
-- Minimal input required from end-users (like signing a paper waiver)
 - Guest-first flow with no login required
 - Easily pluggable into existing business systems
 - Reusable and dynamic data structures for multiple industries
