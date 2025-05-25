@@ -97,6 +97,8 @@ const WaiverRenderer = ({
           case 'input':
           case 'checkbox':
           case 'radio':
+          case "dropdown":
+          case 'textarea':
             value = inputValues[fieldId] || '';
             setValue = (val: string) => {
               setInputValues((prev) => ({ ...prev, [fieldId]: val }));
@@ -104,8 +106,11 @@ const WaiverRenderer = ({
             };
             break
         }
-
-        return fieldDef.render(interacted, fieldId, onClick, value, setValue, subtype);
+        return (
+          <div key={fieldId}>
+            {fieldDef.render(interacted, fieldId, onClick, value, setValue, subtype)}
+          </div>
+        );
       })}
     </div>
   );
