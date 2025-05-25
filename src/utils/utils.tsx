@@ -7,11 +7,11 @@ type WaiverToken = {
 type ParsedContent = (string | WaiverToken)[];
 
 export function parseWaiverTemplate(template: string): ParsedContent {
-  const regex = /{{(name|signature|date|input|checkbox|radio)(?::([^}]+))?}}/g;
+  const regex = /{{(name|signature|date|input|checkbox|radio|dropdown|textarea)(?::([^}]+))?}}/g;
 
   const result: ParsedContent = [];
   let lastIndex = 0;
-  // Track count of each type for id assignment
+
   const typeCounts: { [key: string]: number } = {
     name: 0,
     signature: 0,
@@ -19,11 +19,12 @@ export function parseWaiverTemplate(template: string): ParsedContent {
     input: 0,
     checkbox: 0,
     radio: 0,
+    dropdown: 0,
+    textarea: 0,
   };
 
   let match: RegExpExecArray | null;
   while ((match = regex.exec(template)) !== null) {
-    // match[1] = type, match[2] = subtype
     const type = match[1];
     const subtype = match[2] || null; // Use null if subtype is undefined
     const matchStart = match.index;
@@ -43,7 +44,7 @@ export function parseWaiverTemplate(template: string): ParsedContent {
     lastIndex = regex.lastIndex;
   }
 
-  // Add any remaining text after the last match
+    // Add any remaining text after the last match
   if (lastIndex < template.length) {
     result.push(template.slice(lastIndex));
   }
@@ -52,10 +53,15 @@ export function parseWaiverTemplate(template: string): ParsedContent {
 }
 
 export function parseSubtype(subtype: string | null | undefined) {
-  //could use null return object to manipulate outside template definition
-  if (!subtype) return { fieldName: null, options: [] };
+    //could use null return object to manipulate outside template definition
+  if (!subtype) return { fieldName: null, options: [], label: null };
 
-  const [fieldName, ...options] = subtype.split(':');
-  return { fieldName, options };
+  const [main, labelPart] = subtype.split(';'); // split once at semicolon
+  const [fieldName, ...options] = main.split(':');
+
+  return {
+    fieldName: fieldName.trim(),
+    options: options.map(o => o.trim()),
+    label: labelPart?.trim() ?? null
+  };
 }
-
