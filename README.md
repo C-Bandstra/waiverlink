@@ -20,6 +20,7 @@ The system is designed to be frictionless for guests, easy to manage for staff, 
 ## Core Concepts
 
 - **Seed-based architecture**: Each business gets a unique "seed" (config object) that defines their document templates and field rendering logic.
+- **No hardcoded industry logic** – All business-specific logic lives in the seed, not the core renderer.
 - **Dynamic document rendering**: Waivers are parsed from template strings using smart token parsing like `{{input:boardModel}}` or `{{radio:shirtSize:S:M:L:XL}}`.
 - **Field modularity**: Supports various input types such as `input`, `checkbox`, `radio`, and `select` through a centralized `fieldDefinitions` object.
 - **Pluggable UI components**: Fields are rendered dynamically via reusable render functions.
@@ -30,11 +31,6 @@ The system is designed to be frictionless for guests, easy to manage for staff, 
 - Dynamic field rendering (`input`, `checkbox`, `radio`)
 - Easy-to-extend `fieldDefinitions` system
 - Subtype-based option parsing (`radio:shirtSize:S:M:L`)
-
-## Project Philosophy
-
-1. **No hardcoded industry logic** – All business-specific logic lives in the seed, not the core renderer.
-2. **Designed for onboarding** – Developers can onboard new businesses quickly by defining a seed. Businesses can optionally scale into deeper features like analytics and user management.
 
 ## Upcoming Features
 
