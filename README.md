@@ -13,7 +13,7 @@ The system is designed to be frictionless for guests, easy to manage for staff, 
 ## Tech Stack
 
 - **Frontend:** React (Vite) + TypeScript + TailwindCSS
-- **Backend:** Firebase (Auth + Firestore) Future Scalability - MySQL, Express
+- **Backend:** Firebase (Auth + Firestore) Scalability - MySQL, Express
 - **Hosting:** Vercel or Firebase Hosting (TBD)
 
 ## Core Concepts
