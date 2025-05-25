@@ -7,7 +7,7 @@ type WaiverToken = {
 type ParsedContent = (string | WaiverToken)[];
 
 export function parseWaiverTemplate(template: string): ParsedContent {
-  const regex = /{{(name|signature|date|input)(?::([\w-]+))?}}/g;
+  const regex = /{{(name|signature|date|input|checkbox|radio)(?::([^}]+))?}}/g;
 
   const result: ParsedContent = [];
   let lastIndex = 0;
@@ -17,6 +17,8 @@ export function parseWaiverTemplate(template: string): ParsedContent {
     signature: 0,
     date: 0,
     input: 0,
+    checkbox: 0,
+    radio: 0,
   };
 
   let match: RegExpExecArray | null;
@@ -47,5 +49,13 @@ export function parseWaiverTemplate(template: string): ParsedContent {
   }
 
   return result;
+}
+
+export function parseSubtype(subtype: string | null | undefined) {
+  //could use null return object to manipulate outside template definition
+  if (!subtype) return { fieldName: null, options: [] };
+
+  const [fieldName, ...options] = subtype.split(':');
+  return { fieldName, options };
 }
 
