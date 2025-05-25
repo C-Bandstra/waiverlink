@@ -13,7 +13,8 @@ const waiverTemplate = `
   Name of legal parent or guardian: {{input:guardian}}
   Optional text: {{input:optional}}
   Please sign and date here: {{signature}} {{date:current}}
-  By signing, I acknowledge the risks involved.
+  I acknowledge the risks involved. {{checkbox:agreeToTerms: I agree to the terms of this waiver}}
+  T-Shirt Size: {{radio:shirtSize:S:M:L:XL}}
 `;
 
 const signaturePlaceholder = <span className="font-cursive text-xl italic text-gray-700">Charlie Bandstra</span>;
@@ -40,10 +41,10 @@ const WaiverScreen: FC = () => {
     console.log('Waiver submitted:', {
       name,
       timestamp: new Date().toISOString(),
+      agreed: agreed,
       touched,
       values: {
         ...fieldValues,
-        name,
       },
     });
   };
@@ -111,7 +112,7 @@ const WaiverScreen: FC = () => {
               className="mt-1"
             />
             <label htmlFor="agree" className="text-sm text-gray-700">
-              I agree to the demo waiver terms and consent to sign electronically.
+              I agree to the waiverlink terms and consent to sign electronically.
             </label>
           </div>
         )}
