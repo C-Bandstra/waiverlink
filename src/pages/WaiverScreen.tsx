@@ -13,9 +13,11 @@ const waiverTemplate = `
   Name of legal parent or guardian: {{input:guardian}}
   Optional text: {{input:optional}}
   Please sign and date here: {{signature}} {{date:current}}
-  I acknowledge the risks involved. {{checkbox:agreeToTerms: I agree to the terms of this waiver}}
-  T-Shirt Size: {{radio:shirtSize:S:M:L:XL}}
-`;
+  T-Shirt Size: {{radio:shirtSize:Small:Medium:Large:Extra Large}}
+  {{checkbox:agreeToTerms: I agree to the terms of this waiver}}
+  {{textarea:concerns:Example of option;Any concerns you have can be listed here:}}
+  {{dropdown:riderLevel:Beginner:Intermediate:Advanced:Expert;Select Skill Level}}
+  `;
 
 const signaturePlaceholder = <span className="font-cursive text-xl italic text-gray-700">Charlie Bandstra</span>;
 
