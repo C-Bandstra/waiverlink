@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 
 import type { WaiverToken, FieldDefinition } from '../types/waiver';
+import { parseSubtype } from '../utils/utils';
 
 interface SeedData {
   fieldDefinitions: Record<string, FieldDefinition>;
@@ -61,17 +62,14 @@ const WaiverRenderer = ({
 
         const { type, id, subtype } = chunk;
 
-        let fieldId: string;
-        if (subtype) {
-          fieldId = `${type}-${subtype}`;
-        } else {
-          fieldId = `${type}-${id}`;
-        }
+        const { fieldName } = parseSubtype(subtype);
+        const fieldId = `${type}-${fieldName ?? id}`;
 
         const interacted = interactions[fieldId];
         const onClick = () => handleFieldClick(type, fieldId, subtype);
 
         const fieldDef = seed.fieldDefinitions[type];
+
         if (!fieldDef) {
           return (
             <span key={index} className="text-red-500 italic">
@@ -97,12 +95,14 @@ const WaiverRenderer = ({
             value = signatureElement;
             break;
           case 'input':
+          case 'checkbox':
+          case 'radio':
             value = inputValues[fieldId] || '';
             setValue = (val: string) => {
               setInputValues((prev) => ({ ...prev, [fieldId]: val }));
               onFieldValueChange(fieldId, val);
             };
-            break;
+            break
         }
 
         return fieldDef.render(interacted, fieldId, onClick, value, setValue, subtype);
