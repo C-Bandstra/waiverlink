@@ -1,15 +1,11 @@
-type WaiverToken = {
-  type: string;        // e.g., "name", "signature", "date", "input"
-  id: number;         // count of this type in the waiver string (1-based)
-  subtype?: string | null;  // optional subtype or identifier (e.g., "boardModel")
-};
+import type { WaiverToken } from "../types";
 
 type ParsedContent = (string | WaiverToken)[];
 
 export function parseWaiverTemplate(template: string): ParsedContent {
-  const regex = /{{(name|signature|date|input|checkbox|radio|dropdown|textarea)(?::([^}]+))?}}/g;
+  const regex = /{{(name|signature|date|input|checkbox|radio|dropdown|textarea|br)(?::([^}]+))?}}/g;
 
-  const result: ParsedContent = [];
+  const chunks: ParsedContent = [];
   let lastIndex = 0;
 
   const typeCounts: { [key: string]: number } = {
@@ -35,21 +31,21 @@ export function parseWaiverTemplate(template: string): ParsedContent {
 
     // Add any preceding text as a string
     if (lastIndex < matchStart) {
-      result.push(template.slice(lastIndex, matchStart));
+      chunks.push(template.slice(lastIndex, matchStart));
     }
 
     // Add the WaiverToken with type, id, and subtype
-    result.push({ type, id, subtype });
+    chunks.push({ type, id, subtype });
 
     lastIndex = regex.lastIndex;
   }
 
     // Add any remaining text after the last match
   if (lastIndex < template.length) {
-    result.push(template.slice(lastIndex));
+    chunks.push(template.slice(lastIndex));
   }
 
-  return result;
+  return chunks;
 }
 
 export function parseSubtype(subtype: string | null | undefined) {
