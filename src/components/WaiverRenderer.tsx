@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 
 import type { WaiverToken, FieldDefinition } from '../types/waiver';
-import { parseSubtype } from '../utils/utils';
+import { parseSubtype } from '../utils/parsers';
 
 interface SeedData {
   fieldDefinitions: Record<string, FieldDefinition>;
@@ -56,18 +56,22 @@ const WaiverRenderer = ({
   );
 
   return (
-    <div className="space-y-2 text-left">
+    <div className="text-left">
       {content.map((chunk, index) => {
-        if (typeof chunk === 'string') return <span key={index}>{chunk}</span>;
+        if (typeof chunk === 'string') {
+          return <span key={index}>{chunk}</span>;
+        }
+
+        if (chunk.type === 'br') {
+          return <span key={index} className="block my-3" />;
+        } 
 
         const { type, id, subtype } = chunk;
-
         const { fieldName } = parseSubtype(subtype);
         const fieldId = `${type}-${fieldName ?? id}`;
 
         const interacted = interactions[fieldId];
         const onClick = () => handleFieldClick(type, fieldId, subtype);
-
         const fieldDef = seed.fieldDefinitions[type];
 
         if (!fieldDef) {
@@ -97,19 +101,20 @@ const WaiverRenderer = ({
           case 'input':
           case 'checkbox':
           case 'radio':
-          case "dropdown":
+          case 'dropdown':
           case 'textarea':
             value = inputValues[fieldId] || '';
             setValue = (val: string) => {
               setInputValues((prev) => ({ ...prev, [fieldId]: val }));
               onFieldValueChange(fieldId, val);
             };
-            break
+            break;
         }
+
         return (
-          <div key={fieldId}>
+          <span key={fieldId} className="inline-block align-baseline">
             {fieldDef.render(interacted, fieldId, onClick, value, setValue, subtype)}
-          </div>
+          </span>
         );
       })}
     </div>
