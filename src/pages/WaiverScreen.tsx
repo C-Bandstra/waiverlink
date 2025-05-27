@@ -1,27 +1,23 @@
 import { useState } from 'react';
 import type { FC, FormEvent, JSX } from 'react';
 import WaiverRenderer from '../components/WaiverRenderer';
-import { parseWaiverTemplate } from '../utils/utils';
-import NeverSummer from '../seed/never-summer';
-
-const waiverTemplate = `
-  I, {{name}}, agree to the terms of this agreement.
-  Board Model: {{input:boardModel}}
-  If you are under the age of 18, please complete the following:
-  I am under the age of 18 and my legal parent or guardian agrees to the terms stated in the waiver above.
-  My birth date: {{date:birthDate}}
-  Name of legal parent or guardian: {{input:guardian}}
-  Optional text: {{input:optional}}
-  Please sign and date here: {{signature}} {{date:current}}
-  T-Shirt Size: {{radio:shirtSize:Small:Medium:Large:Extra Large}}
-  {{checkbox:agreeToTerms: I agree to the terms of this waiver}}
-  {{textarea:concerns:Example of option;Any concerns you have can be listed here:}}
-  {{dropdown:riderLevel:Beginner:Intermediate:Advanced:Expert;Select Skill Level}}
-  `;
+import { parseWaiverTemplate } from '../utils/parsers';
+import { useSeed } from '../context/SeedContext';
+import type { WaiverScreenProps } from '../types';
+import { useParams } from 'react-router-dom';
+import ErrorMessage from '../components/ErrorMessage';
 
 const signaturePlaceholder = <span className="font-cursive text-xl italic text-gray-700">Charlie Bandstra</span>;
 
-const WaiverScreen: FC = () => {
+const WaiverScreen: FC<WaiverScreenProps> = () => {
+  const { waiverId } = useParams();
+  const seed = useSeed();
+  
+  if (!waiverId) return <ErrorMessage message="Waiver ID is required." />;
+
+  const waiverTemplate = seed.waiverTemplates[waiverId as keyof typeof seed.waiverTemplates];
+  if (!waiverTemplate) return <div>Template not found</div>;
+
   const [name, setName] = useState<string>('');
   const [signatureElement, setSignatureElement] = useState<JSX.Element | null>(null);
   const [agreed, setAgreed] = useState<boolean>(false);
@@ -41,9 +37,14 @@ const WaiverScreen: FC = () => {
     e.preventDefault();
 
     console.log('Waiver submitted:', {
-      name,
+      seedId: seed.id,
+      templateId: waiverTemplate.id,
       timestamp: new Date().toISOString(),
-      agreed: agreed,
+      submittedBy: {
+        name,
+        signatureElement,
+        agreed: agreed, //waiverlink terms NOT business waiver terms
+      },
       touched,
       values: {
         ...fieldValues,
@@ -54,48 +55,54 @@ const WaiverScreen: FC = () => {
   const isFormValid = name && agreed;
 
   return (
-    <div className="w-full max-w-screen-sm sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto p-4">
+    <div className="w-full max-w-screen-sm sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-md xl:max-w-screen-lg mx-auto p-2">
+      <div className="flex items-center content-center w-full">
+        <img src={seed.image} className="bg-black p-2 mb-2"/>
+        <h1 className="text-2xl font-semibold mb-4 hidden">{seed.name}</h1>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Full Name:
-          </label>
-          <input
-            id="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-          />
-        </div>
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 text-left">
+              Full Name:
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Signature:
-          </label>
-          <div className="border border-gray-400 rounded-md w-full h-24 flex items-center justify-center text-gray-500">
-            <span
-              onClick={() => {
-                if (!signatureElement) setSignatureElement(signaturePlaceholder);
-              }}
-              className="inline-block min-w-[150px] text-gray-400 italic cursor-pointer"
-            >
-              {signatureElement || 'Create Signature'}
-            </span>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
+              Signature:
+            </label>
+            <div className="border border-gray-400 rounded-md w-full h-24 flex items-center justify-center text-gray-500">
+              <span
+                onClick={() => {
+                  if (!signatureElement) setSignatureElement(signaturePlaceholder);
+                }}
+                className="inline-block min-w-[150px] text-gray-400 italic cursor-pointer"
+              >
+                {signatureElement || 'Create Signature'}
+              </span>
+            </div>
           </div>
         </div>
-
-        <h1 className="text-2xl font-semibold mb-4">Demo Waiver Template</h1>
+        <h2 className="text-2xl font-semibold mb-4 text-left underline">{waiverTemplate.title}</h2>
+                
         {name && signatureElement ? (
-          <div className="my-6 border border-black py-24">
+          <div className="my-6 border border-black p-4">
             <WaiverRenderer
-              content={parseWaiverTemplate(waiverTemplate)}
+              content={parseWaiverTemplate(waiverTemplate.content)}
               name={name}
               signatureElement={signaturePlaceholder}
               onFieldInteract={onFieldInteract}
               onFieldValueChange={onFieldValueChange}
-              seed={NeverSummer}
+              seed={seed}
             />
           </div>
         ) : (
