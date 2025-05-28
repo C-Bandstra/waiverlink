@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import type { FC, FormEvent, JSX } from 'react';
-import WaiverRenderer from '../components/WaiverRenderer';
-import { parseWaiverTemplate } from '../utils/parsers';
-import { useSeed } from '../context/SeedContext';
-import type { WaiverScreenProps } from '../types';
+import WaiverRenderer from '../../components/WaiverRenderer';
+import { parseWaiverTemplate } from '../../utils/parsers';
+import { useSeed } from '../../context/SeedContext';
+import type { WaiverProps } from '../../types';
 import { useParams } from 'react-router-dom';
-import ErrorMessage from '../components/ErrorMessage';
+import ErrorMessage from '../../components/ErrorMessage';
 
 const signaturePlaceholder = <span className="font-cursive text-xl italic text-gray-700">Charlie Bandstra</span>;
 
-const WaiverScreen: FC<WaiverScreenProps> = () => {
+const Waiver: FC<WaiverProps> = () => {
   const { waiverId } = useParams();
   const seed = useSeed();
   
@@ -140,4 +140,4 @@ const WaiverScreen: FC<WaiverScreenProps> = () => {
   );
 };
 
-export default WaiverScreen;
+export default Waiver;

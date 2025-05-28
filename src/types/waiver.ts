@@ -8,7 +8,7 @@ export type Waiver = {
   signedAt: string
 }
 
-export interface WaiverScreenProps {
+export interface WaiverProps {
   // setNotifications: React.Dispatch<React.SetStateAction<string>>;
 }
 
