@@ -61,3 +61,13 @@ export function parseSubtype(subtype: string | null | undefined) {
     label: labelPart?.trim() ?? null
   };
 }
+
+export function parseFieldId(fieldId: string): WaiverToken {
+  const [type, subtypeOrId] = fieldId.split("-");
+  const isNumber = !isNaN(Number(subtypeOrId));
+  return {
+    type,
+    id: isNumber ? Number(subtypeOrId) : 1,
+    subtype: isNumber ? null : subtypeOrId,
+  };
+}
