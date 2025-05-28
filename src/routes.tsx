@@ -1,10 +1,10 @@
-import WaiverScreen from "./pages/WaiverScreen";
-import Admin from "./pages/Admin";
+import Waiver from "./pages/waiver/Waiver";
+import Admin from "./pages/admin/Admin";
 
 export const routes = [
   {
     path: "waiver/:waiverId?",
-    component: WaiverScreen,
+    component: Waiver,
   },
   {
     path: "admin",
