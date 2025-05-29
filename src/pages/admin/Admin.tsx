@@ -4,7 +4,7 @@ import Dashboard from "./Dashboard";
 
 const Admin: React.FC = () => {
   return (
-    <div className="max-w-5xl mt-8">
+    <div className="mt-8">
       <Dashboard />
     </div>
   );
