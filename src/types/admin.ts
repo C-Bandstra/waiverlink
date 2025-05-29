@@ -3,9 +3,10 @@ export type WaiverRow = {
 };
 
 export type Column = {
-  key: string;             // The key in the data object to display (e.g., "name")
-  label: string;            // The header label shown in the table (e.g., "Name")
-  filterable?: boolean;     // Whether to show a filter input for this column
+  key: string;
+  label: string;
+  filterable?: boolean;
+  type?: string; // "text" | "textarea" | "checkbox" | "date" | "number" | "signature";
 };
 
 export interface DataGridProps {
@@ -24,5 +25,12 @@ export interface WaiverSubmission {
   touched: Record<string, boolean>;
   values: Record<string, any>;
 }
+
+export type SubmissionCardProps = {
+  submission: WaiverSubmission;
+  highlightKeys?: string[];
+};
+
+
 
 
