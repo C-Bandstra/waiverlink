@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import type { SubmissionCardProps } from "../types/admin";
 import { parseFieldId } from "../utils/parsers";
 import logo from "../assets/sample-document.png";
+import { Timestamp } from 'firebase/firestore';
 
 const SubmissionCard: React.FC<SubmissionCardProps> = ({
   submission,
@@ -11,9 +12,14 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [showImage, setShowImage] = useState(false);
 
+
+  const date = timestamp instanceof Timestamp
+    ? timestamp.toDate()
+    : new Date(timestamp);
+
   useEffect(() => {
     const checkWidth = () => {
-      setShowImage(window.innerWidth >= 500); // show image if window width >= 600px
+      setShowImage(window.innerWidth >= 390); // show image if window width >= 600px
     };
     checkWidth();
     window.addEventListener("resize", checkWidth);
@@ -37,13 +43,13 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({
   const visibleEntries = isExpanded ? orderedEntries : orderedEntries.slice(0, 3);
 
   return (
-    <div className="rounded-xl shadow p-4 bg-white border flex justify-between items-start">
+    <div className="rounded-xl shadow p-4 bg-white border flex justify-between items-start max-w-[550px]">
       <div className="flex-1 min-w-0">
         <div className="mb-2 text-lg font-semibold text-gray-800">
           {submittedBy.name}
         </div>
         <div className="text-sm text-gray-500 mb-3">
-          Submitted on {new Date(timestamp).toLocaleString()}
+          {date.toLocaleString()}
         </div>
         <div className="space-y-1">
           {visibleEntries.map(([fieldId, value]) => {
