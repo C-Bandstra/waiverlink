@@ -1,13 +1,24 @@
-// pages/admin/AdminDashboard.tsx
-import React from "react";
-import Dashboard from "./Dashboard";
+import { Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { listenToSubmissions } from "../../firebase/admin/listenToSubmissions";
+import { useSeed } from "../../context/SeedContext";
+import type { WaiverSubmission } from "../../types/admin";
 
 const Admin: React.FC = () => {
+  const [waiverSubmissions, setWaiverSubmissions] = useState<WaiverSubmission[]>([]);
+  const seed = useSeed();
+
+  useEffect(() => {
+    const unsub = listenToSubmissions(seed.id, "waivers", setWaiverSubmissions);
+    return () => unsub?.();
+  }, [seed.id]);
+
   return (
-    <div className="mt-8">
-      <Dashboard />
-    </div>
-  );
-}
+    <>
+      <p>Admin</p>
+      <Outlet context={{ waiverSubmissions }} />
+    </>
+);
+};
 
 export default Admin;
