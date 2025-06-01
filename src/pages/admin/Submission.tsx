@@ -60,20 +60,22 @@ const Submission = () => {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold mb-4">
-        {title} Submissions
-        <p className="text-red-500 text-sm">
-          {title === "Unknown Template" ? "Verify a title exists for this template" : ""}
-        </p>
-      </h1>
+      <div className="w-fit">
+        <h1 className="text-xl font-semibold mb-4">
+          {title} Submissions
+          <p className="text-red-500 text-sm">
+            {title === "Unknown Template" ? "Verify a title exists for this template" : ""}
+          </p>
+        </h1>
 
-      <input
-        type="text"
-        placeholder="Search by field or value..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="w-full border border-gray-300 rounded px-3 py-2 text-sm mb-4 min-w-[255px]"
-      />
+        <input
+          type="text"
+          placeholder="Search by field or value..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full border border-gray-300 rounded px-3 py-2 text-sm mb-4 min-w-[255px]"
+        />
+      </div>
 
       {isDesktop ? (
         <DataGrid data={dataGridRows} />
