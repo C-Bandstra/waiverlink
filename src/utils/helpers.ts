@@ -1,4 +1,4 @@
-
+import React from 'react';
 import { seeds } from '../seed/seeds.ts';
 
 export function getSeedBySlug(slug: string = "") {
@@ -17,4 +17,102 @@ export function getSeedFromHostOrParam(hostname: string, paramId?: string) {
   if (!seed) throw new Error(`Seed not found for id: ${seedId}`);
 
   return seed;
+}
+
+export const waiverData = {
+  title: "Assumption of Risk",
+  submissions: [
+    {
+      seedId: "never-summer",
+      templateId: "demo",
+      timestamp: "2025-05-28T00:36:28.099Z",
+      submittedBy: { 
+        name: "Charlie Bandstra",
+        signatureElement: "<p>Signature</p>",
+        agreed: true, //waiverlink terms NOT business waiver terms
+      },
+      values: {
+        "name-signeeName": "Charlie Bandstra",
+        "input-boardModel": "Eclipse",
+        "dropdown-riderLevel": "Advanced",
+        "radio-shirtSize": "Large",
+        "date-birthDate": "2010-07-14",
+        "input-guardian": "Josh Bandstra",
+        "textarea-concerns": "High Blood Pressure",
+        "checkbox-agreeToTerms": "true"
+      },
+      touched: {
+        test: true
+      }
+    },
+    {
+      seedId: "never-summer",
+      templateId: "demo",
+      timestamp: "2025-05-28T00:36:28.099Z",
+      submittedBy: { 
+        name: "Charlie Bandstra",
+        signatureElement: "<p>Signature</p>",
+        agreed: true, //waiverlink terms NOT business waiver terms 
+      },
+      values: {
+        "name-signeeName": "Charlie Bandstra",
+        "input-boardModel": "Eclipse",
+        "dropdown-riderLevel": "Advanced",
+        "radio-shirtSize": "Small",
+        "date-birthDate": "2010-07-14",
+        "input-guardian": "Josh Bandstra",
+        "textarea-concerns": "High Blood Pressure testing a long concern just to see how the document responds to this Pressure testing a long concern just to see how the document responds to this",
+        "checkbox-agreeToTerms": "true"
+      },
+      touched: {
+        test: true
+      }
+    },
+    {
+      seedId: "never-summer",
+      templateId: "demo",
+      timestamp: "2025-05-27T18:45:11.229Z",
+      submittedBy: { 
+        name: "Alice Johnson",
+        signatureElement: "<p>Signature</p>",
+        agreed: true, //waiverlink terms NOT business waiver terms
+      },
+      values: {
+        "name-signeeName": "Alice Johnson",
+        "input-boardModel": "Proto Slinger",
+        "dropdown-riderLevel": "Beginner",
+        "radio-shirtSize": "Large",
+        "date-birthDate": "2012-03-10",
+        "input-guardian": "Lara Johnson",
+        "textarea-concerns": "None",
+        "checkbox-agreeToTerms": "true"
+      },
+      touched: {
+        test: true
+      }
+    },
+    {
+      seedId: "never-summer",
+      templateId: "demo",
+      timestamp: "2025-05-27T12:22:03.515Z",
+      submittedBy: { 
+        name: "Bob Stone",
+        signatureElement: "<p>Signature</p>",
+        agreed: true, //waiverlink terms NOT business waiver terms
+      },
+      values: {
+        "name-signeeName": "Bob Stone",
+        "input-boardModel": "Swift",
+        "dropdown-riderLevel": "Intermediate",
+        "radio-shirtSize": "Medium",
+        "date-birthDate": "2008-11-23",
+        "input-guardian": "N/A",
+        "textarea-concerns": "Asthma",
+        "checkbox-agreeToTerms": "false"
+      },
+      touched: {
+        test: true
+      }
+    }
+  ]
 }

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { initializeApp } from "firebase/app";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { getFirestore } from "firebase/firestore"; // or getDatabase if using Realtime DB
@@ -43,6 +42,7 @@ let authReady = new Promise((resolve, reject) => {
   });
 });
 
+export { auth, db, authReady };
 // USAGE IN COMPONENT OR UTILITY FILE
 // --------------------------------------------------------
 // import { authReady, db } from "./firebase";
@@ -53,4 +53,3 @@ let authReady = new Promise((resolve, reject) => {
 //   // Use db to read/write to Firestore with this UID
 // }
 
-export { auth, db, authReady };
