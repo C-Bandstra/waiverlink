@@ -1,18 +1,13 @@
-import Waiver from "./pages/waiver/Waiver";
-import Admin from "./pages/admin/Admin";
+import Waiver from "../pages/waiver/Waiver";
 
-export const routes = [
+export const publicRoutes = [
   {
     path: "waiver/:waiverId?",
     component: Waiver,
   },
-  {
-    path: "admin",
-    component: Admin,
-  },
 ];
 
-export default routes;
+export default publicRoutes;
 
 // UPDATE TO THIS FLOW BELOW
 // Guest Sign Flow
