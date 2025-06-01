@@ -1,6 +1,7 @@
 export const demoWaiverTemplate = {
   id: "demo",
   title: "Equipment Demo Waiver",
+  groupingId: "waivers",
   content: `
     I, {{name}}, acknowledge and agree to the terms and conditions outlined in this release of liability. I understand that snowboarding, demoing equipment, and related activities involve inherent risks. I voluntarily assume full responsibility for any injuries or damages that may occur during my participation in a Never Summer Industries event or while using Never Summer demo gear.
     {{br}}
@@ -28,13 +29,14 @@ export const demoWaiverTemplate = {
     {{br}}
     Date: {{date:current}}
     {{br}}
-    {{checkbox:agreeToTerms:I have read and agree to the terms of this waiver and voluntarily participate in Never Summer activities.}}
-  `
-}
+    `
+  }
+  // {{checkbox:agreeToTerms:I have read and agree to the terms of this waiver and voluntarily participate in Never Summer activities.}}
 
 export const adminWaiverTemplate = {
   id: "admin",
   title: "Admin Waiver",
+  groupingId: "waivers",
   content: `
     I, {{name}}, acknowledge and agree to the terms and conditions outlined in this release of liability. I understand that snowboarding, demoing equipment, and related activities involve inherent risks. I voluntarily assume full responsibility for any injuries or damages that may occur during my participation in a Never Summer Industries event or while using Never Summer demo gear.
     {{br}}
