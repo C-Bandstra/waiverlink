@@ -3,13 +3,16 @@ import type { FC, FormEvent, JSX } from 'react';
 import WaiverRenderer from '../../components/WaiverRenderer';
 import { parseWaiverTemplate } from '../../utils/parsers';
 import { useSeed } from '../../context/SeedContext';
-import type { WaiverProps } from '../../types';
+// import type { WaiverProps } from '../../types';
 import { useParams } from 'react-router-dom';
 import ErrorMessage from '../../components/ErrorMessage';
+import type { WaiverSubmission } from '../../types/admin';
+import { submitWaiver } from '../../firebase/submission/submitWaiver';
 
 const signaturePlaceholder = <span className="font-cursive text-xl italic text-gray-700">Charlie Bandstra</span>;
+const signatureElementString = `<span class="font-cursive text-xl italic text-gray-700">Charlie Bandstra</span>`;
 
-const Waiver: FC<WaiverProps> = () => {
+const Waiver: FC = () => {
   const { waiverId } = useParams();
   const seed = useSeed();
   
@@ -33,23 +36,92 @@ const Waiver: FC<WaiverProps> = () => {
     setFieldValues((prev) => ({ ...prev, [fieldId]: value }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  // const handleSubmit = async (e: FormEvent) => {
+  //   e.preventDefault();
+
+  //   const serializedValues: Record<string, string> = {};
+  //     Object.entries(fieldValues).forEach(([key, value]) => {
+  //     if (typeof value === 'string') {
+  //       serializedValues[key] = value;
+  //     } else {
+  //       // ignore or convert React nodes and other types to empty string or string safely
+  //       serializedValues[key] = '';
+  //     }
+  //   });
+
+  //   const waiverSubmission: WaiverSubmission = {
+  //     seedId: seed.id,
+  //     templateId: waiverTemplate.id,
+  //     timestamp: new Date().toISOString(),
+  //     submittedBy: {
+  //       name,
+  //       signatureElement: "", 
+  //       agreed,
+  //     },
+  //     touched,
+  //     values: {
+  //       ...serializedValues,
+  //     },
+  //   };
+  //   console.log('Waiver to be submitted:', waiverSubmission);
+
+  //   try {
+  //     const submissionId = await submitWaiver(seed.id, waiverTemplate.groupingId, waiverSubmission);
+  //     console.log("Successfully submitted:", submissionId);
+  //     // Maybe navigate or show success UI
+  //   } catch (err) {
+  //     console.error("Submission failed:", err);
+  //   }
+  // };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    console.log('Waiver submitted:', {
+    // Properly serialize values for Firestore:
+    const serializedValues: Record<string, any> = {};
+
+    Object.entries(fieldValues).forEach(([key, value]) => {
+      if (value instanceof Date) {
+        // Keep Date objects as is
+        serializedValues[key] = value;
+      } else if (typeof value === 'boolean') {
+        serializedValues[key] = value;
+      } else if (typeof value === 'string') {
+        serializedValues[key] = value;
+      } else if (value === null || value === undefined) {
+        // Either omit or store as null
+        serializedValues[key] = null;
+      } else {
+        // For React nodes or other weird types, convert to empty string
+        serializedValues[key] = '';
+      }
+    });
+
+    // For "agreed", make sure it's a boolean, not string
+    const agreedBool = !!agreed;
+
+    const waiverSubmission: WaiverSubmission = {
       seedId: seed.id,
       templateId: waiverTemplate.id,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date(), // <-- use Date object, NOT ISO string
+      title: waiverTemplate.title,
       submittedBy: {
         name,
-        signatureElement,
-        agreed: agreed, //waiverlink terms NOT business waiver terms
+        signatureElement: signatureElementString, // keep empty string if no signature
+        agreed: agreedBool,
       },
       touched,
-      values: {
-        ...fieldValues,
-      },
-    });
+      values: serializedValues,
+    };
+
+    console.log('Waiver to be submitted:', waiverSubmission);
+
+    try {
+      const submissionId = await submitWaiver(seed.id, waiverTemplate.groupingId, waiverSubmission);
+      console.log("Successfully submitted:", submissionId);
+    } catch (err) {
+      console.error("Submission failed:", err);
+    }
   };
 
   const isFormValid = name && agreed;
