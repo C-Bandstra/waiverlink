@@ -16,7 +16,9 @@ export interface DataGridProps {
 export interface WaiverSubmission {
   seedId: string;
   templateId: string;
-  timestamp: string;
+  timestamp: Date;
+  serverTimestamp?: any;
+  title: string;
   submittedBy: {
     name: string;
     signatureElement: any;
@@ -30,6 +32,18 @@ export type SubmissionCardProps = {
   submission: WaiverSubmission;
   highlightKeys?: string[];
 };
+
+export type Template = {
+  id: string;
+  title: string;
+  groupingId: string;
+  content: string;
+};
+
+export interface DashboardContext {
+  waiverSubmissions: WaiverSubmission[];
+}
+
 
 
 
