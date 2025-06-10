@@ -2,13 +2,19 @@ import type { WaiverToken } from "../types";
 
 type ParsedContent = (string | WaiverToken)[];
 
+/**
+ * Parses a waiver template string and returns an array of content chunks.
+ * Each chunk is either a plain text string or a structured WaiverToken object.
+ */
 export function parseWaiverTemplate(template: string): ParsedContent {
-  const regex = /{{(name|signature|date|input|checkbox|radio|dropdown|textarea|br)(?::([^}]+))?}}/g;
+  // Match tokens of the form {{type:subtype|meta}} or variations
+  const regex = /{{(name|signature|date|input|checkbox|radio|dropdown|textarea|br)(?::([^|}]+))?(?:\|([^}]+))?}}/g;
 
   const chunks: ParsedContent = [];
   let lastIndex = 0;
 
-  const typeCounts: { [key: string]: number } = {
+  // Track how many times each type appears to assign unique IDs
+  const typeCounts: Record<string, number> = {
     name: 0,
     signature: 0,
     date: 0,
@@ -17,36 +23,71 @@ export function parseWaiverTemplate(template: string): ParsedContent {
     radio: 0,
     dropdown: 0,
     textarea: 0,
+    br: 0,
   };
 
   let match: RegExpExecArray | null;
   while ((match = regex.exec(template)) !== null) {
-    const type = match[1];
-    const subtype = match[2] || null; // Use null if subtype is undefined
     const matchStart = match.index;
+    const [_fullMatch, type, subtypeRaw, metaRaw] = match;
 
-    // Increment the count for this type and assign as id
+    // Add any preceding static text as a string chunk
+    if (lastIndex < matchStart) {
+      const plainText = template.slice(lastIndex, matchStart);
+      chunks.push(plainText);
+    }
+
+    // Increment count for this token type and assign an ID
     typeCounts[type]++;
     const id = typeCounts[type];
 
-    // Add any preceding text as a string
-    if (lastIndex < matchStart) {
-      chunks.push(template.slice(lastIndex, matchStart));
+    // Build the token object
+    const token: WaiverToken = {
+      type,
+      id,
+    };
+
+    if (subtypeRaw) {
+      token.subtype = subtypeRaw.trim();
     }
 
-    // Add the WaiverToken with type, id, and subtype
-    chunks.push({ type, id, subtype });
+    if (metaRaw) {
+      token.meta = parseMeta(metaRaw);
+    }
 
+    chunks.push(token);
     lastIndex = regex.lastIndex;
   }
 
-    // Add any remaining text after the last match
+  // Add any remaining text after the last match
   if (lastIndex < template.length) {
-    chunks.push(template.slice(lastIndex));
+    const remainingText = template.slice(lastIndex);
+    chunks.push(remainingText);
   }
 
   return chunks;
 }
+
+/**
+ * Parses a metadata string into a key-value map.
+ * Example: "font-size:40px;color:red" => { "font-size": "40px", "color": "red" }
+ */
+function parseMeta(metaString: string): Record<string, string> {
+  const meta: Record<string, string> = {};
+
+  metaString.split(';').forEach(pair => {
+    const [rawKey, rawValue] = pair.split(':');
+    const key = rawKey?.trim();
+    const value = rawValue?.trim();
+
+    if (key && value) {
+      meta[key] = value;
+    }
+  });
+
+  return meta;
+}
+
 
 export function parseSubtype(subtype: string | null | undefined) {
     //could use null return object to manipulate outside template definition
@@ -70,4 +111,26 @@ export function parseFieldId(fieldId: string): WaiverToken {
     id: isNumber ? Number(subtypeOrId) : 1,
     subtype: isNumber ? null : subtypeOrId,
   };
+}
+
+export function metaToInlineStyle(meta?: Record<string, string>): React.CSSProperties {
+  if (!meta) return {};
+
+  const style: React.CSSProperties = {};
+
+  for (const [key, value] of Object.entries(meta)) {
+    // Detect if the key is prefixed with "!" to mean "!important"
+    // !!!! important DOES NOT work in inline styling. Extrapolate to element
+    //  injection method which can use important keyword from token
+    const isImportant = key.startsWith('!');
+    const cleanKey = isImportant ? key.slice(1) : key;
+
+    const camelKey = cleanKey.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+
+    if (camelKey in document.body.style) {
+      (style as any)[camelKey] = isImportant ? `${value} !important` : value;
+    }
+  }
+
+  return style;
 }
