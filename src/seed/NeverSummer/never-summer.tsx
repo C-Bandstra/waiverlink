@@ -1,4 +1,3 @@
-// import React from 'react';
 import type { FieldDefinition } from '../../types/waiver';
 import { demoWaiverTemplate, adminWaiverTemplate } from './templates';
 import logo from "../../assets/never-summer.png"
