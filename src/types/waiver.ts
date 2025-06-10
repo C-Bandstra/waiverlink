@@ -13,9 +13,10 @@ export interface WaiverProps {
 }
 
 export interface WaiverToken {
-  type: string; // e.g., "name", "signature", "date", "input"
-  id: number;  // count of this type in the waiver string (1-based)
-  subtype?: string | null;  // optional subtype or identifier (e.g., "boardModel")
+  type: string;                      // "input", "dropdown", etc.
+  id: number;                        // 1-based index of this token type
+  subtype?: string | null;          // raw field definition before '|'
+  meta?: Record<string, string>;    // parsed metadata like { style: 'highlight' }
 }
 
 export interface SubType {
@@ -32,7 +33,8 @@ export interface FieldDefinition {
     onClick: () => void,
     value?: string | React.ReactNode,
     setValue?: (val: string) => void,
-    subtype?: string | null
+    subtype?: string | null,
+    meta?: Record<string, string>
   ) => React.ReactNode;
 }
 
