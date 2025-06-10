@@ -15,7 +15,7 @@ const SeedLayout = () => {
   const seed = getSeedBySlug(seedSlug);
 
   if (!seed) return <ErrorMessage message="Seed not found" />;
-
+  
   return (
     <SeedProvider seed={seed}>
       <Header />
@@ -39,7 +39,7 @@ const App: React.FC = () => {
     <Routes>
       <Route
         path="/"
-        element={<ErrorMessage message="You don't have a seed. You need a seed to use WaiverLink." />}
+        element={<ErrorMessage message="You don't have a seed. You need a seed to use waiverlink." />}
       />
 
       <Route path="/:seedSlug/*" element={<SeedLayout />}>
