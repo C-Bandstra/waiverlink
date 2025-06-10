@@ -66,7 +66,7 @@ const WaiverRenderer = ({
           return <span key={index} className="block my-3" />;
         } 
 
-        const { type, id, subtype } = chunk;
+        const { type, id, subtype, meta } = chunk;
         const { fieldName } = parseSubtype(subtype);
         const fieldId = `${type}-${fieldName ?? id}`;
 
@@ -113,7 +113,7 @@ const WaiverRenderer = ({
 
         return (
           <span key={fieldId} className="inline-block align-baseline">
-            {fieldDef.render(interacted, fieldId, onClick, value, setValue, subtype)}
+            {fieldDef.render(interacted, fieldId, onClick, value, setValue, subtype, meta)}
           </span>
         );
       })}
