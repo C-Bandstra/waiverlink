@@ -1,11 +1,10 @@
-import React from 'react';
 import { seeds } from '../seed/seeds.ts';
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 
 export function getSeedBySlug(slug: string = "") {
   const seed = seeds[slug];
-  if (!seed) {
-    throw new Error(`Seed not found for slug: ${slug}`);
-  }
+
   return seed;
 }
 
@@ -17,6 +16,13 @@ export function getSeedFromHostOrParam(hostname: string, paramId?: string) {
   if (!seed) throw new Error(`Seed not found for id: ${seedId}`);
 
   return seed;
+}
+
+export function reactElementToString(element: React.ReactNode): string {
+  if (React.isValidElement(element)) {
+    return ReactDOMServer.renderToStaticMarkup(element);
+  }
+  return '';
 }
 
 export const waiverData = {
