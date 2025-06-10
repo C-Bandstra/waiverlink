@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import type { FC, FormEvent, JSX } from 'react';
 import WaiverRenderer from '../../components/WaiverRenderer';
 import { parseWaiverTemplate } from '../../utils/parsers';
@@ -8,9 +8,10 @@ import { useParams } from 'react-router-dom';
 import ErrorMessage from '../../components/ErrorMessage';
 import type { WaiverSubmission } from '../../types/admin';
 import { submitWaiver } from '../../firebase/submission/submitWaiver';
+import { reactElementToString } from '../../utils/helpers';
 
-const signaturePlaceholder = <span className="font-cursive text-xl italic text-gray-700">Charlie Bandstra</span>;
-const signatureElementString = `<span class="font-cursive text-xl italic text-gray-700">Charlie Bandstra</span>`;
+// const signaturePlaceholder = <span className="font-cursive italic text-gray-700">Charlie Bandstra</span>;
+
 
 const Waiver: FC = () => {
   const { waiverId } = useParams();
@@ -73,6 +74,7 @@ const Waiver: FC = () => {
   //     console.error("Submission failed:", err);
   //   }
   // };
+  const signatureElementString = reactElementToString(signatureElement);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -82,17 +84,17 @@ const Waiver: FC = () => {
 
     Object.entries(fieldValues).forEach(([key, value]) => {
       if (value instanceof Date) {
-        // Keep Date objects as is
         serializedValues[key] = value;
-      } else if (typeof value === 'boolean') {
+      } else if (typeof value === 'boolean' || typeof value === 'string') {
         serializedValues[key] = value;
-      } else if (typeof value === 'string') {
-        serializedValues[key] = value;
-      } else if (value === null || value === undefined) {
-        // Either omit or store as null
+      }else if (reactElementToString(value)) {
+        // If value is element
+        serializedValues[key] = reactElementToString(value);
+      }
+      else if (value === null || value === undefined) {
         serializedValues[key] = null;
       } else {
-        // For React nodes or other weird types, convert to empty string
+        // Fallback for anything else
         serializedValues[key] = '';
       }
     });
@@ -126,6 +128,10 @@ const Waiver: FC = () => {
 
   const isFormValid = name && agreed;
 
+  const buildSignatureElement = (name: string): React.ReactElement => (
+    <span className="signature">{name}</span>
+  );
+
   return (
     <div className="w-full max-w-screen-sm sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-md xl:max-w-screen-lg mx-auto p-2">
       <div className="flex items-center content-center w-full">
@@ -153,14 +159,18 @@ const Waiver: FC = () => {
               Signature:
             </label>
             <div className="border border-gray-400 rounded-md w-full h-24 flex items-center justify-center text-gray-500">
-              <span
-                onClick={() => {
-                  if (!signatureElement) setSignatureElement(signaturePlaceholder);
-                }}
-                className="inline-block min-w-[150px] text-gray-400 italic cursor-pointer"
-              >
-                {signatureElement || 'Create Signature'}
-              </span>
+              <div className="text-4xl text-gray-700 italic">
+                <span
+                  onClick={() => {
+                    if (!signatureElement && name.trim()) {
+                      setSignatureElement(buildSignatureElement(name));
+                    }
+                  }}
+                  className="inline-block min-w-[150px] cursor-pointer"
+                >
+                  {signatureElement || 'Create Signature'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -171,7 +181,7 @@ const Waiver: FC = () => {
             <WaiverRenderer
               content={parseWaiverTemplate(waiverTemplate.content)}
               name={name}
-              signatureElement={signaturePlaceholder}
+              signatureElement={signatureElement}
               onFieldInteract={onFieldInteract}
               onFieldValueChange={onFieldValueChange}
               seed={seed}
