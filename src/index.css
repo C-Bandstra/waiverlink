@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.signature {
+  font-family: 'Great Vibes', cursive;
+  /* color: #374151; text-gray-700 */
+  font-style: italic;
+}
