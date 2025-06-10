@@ -67,4 +67,3 @@ export const adminWaiverTemplate = {
     {{checkbox:agreeToTerms:I have read and agree to the terms of this waiver and voluntarily participate in Never Summer activities.}}
   `
 }
- 
