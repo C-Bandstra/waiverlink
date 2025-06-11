@@ -1,6 +1,6 @@
 import { parseFieldId } from "../../utils/parsers";
-import type { Column, DataGridProps } from "../../types/admin";
-import TruncatedCell from "./TruncatedCell";
+import type { Column, DataGridProps, FirestoreValue } from "../../types/admin";
+import DataGridCell from "./DataGridCell";
 
 // Main DataGrid Component
 const DataGrid = ({ data }: DataGridProps) => {
@@ -24,9 +24,9 @@ const DataGrid = ({ data }: DataGridProps) => {
   const columns = deriveColumns(data[0] || {});
 
     // Cell Renderer
-  const renderCell = (value: any, columnType: string) => {
+  const renderCell = (value: FirestoreValue, columnType: string) => {
     //can expand into RenderCell component at a later time
-    return <TruncatedCell value={value} type={columnType} />;
+    return <DataGridCell value={value} type={columnType} />;
   }
 
 

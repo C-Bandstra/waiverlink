@@ -3,6 +3,7 @@ import type { SubmissionCardProps } from "../types/admin";
 import { parseFieldId } from "../utils/parsers";
 import logo from "../assets/sample-document.png";
 import { Timestamp } from 'firebase/firestore';
+import { renderValue } from "../utils/helpers";
 
 const SubmissionCard: React.FC<SubmissionCardProps> = ({
   submission,
@@ -58,7 +59,8 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({
             const readableLabel = baseLabel.replace(/([A-Z])/g, " $1").toLowerCase();
             return (
               <div key={fieldId} className="text-sm text-gray-700">
-                <span className="font-medium">{readableLabel}:</span> {value}
+                <span className="font-medium">{readableLabel}:</span>{" "}
+                {renderValue(value, type)} {/* Use helper here */}
               </div>
             );
           })}

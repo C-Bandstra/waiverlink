@@ -1,6 +1,7 @@
 import { seeds } from '../seed/seeds.ts';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
+import parse from "html-react-parser";
 
 export function getSeedBySlug(slug: string = "") {
   const seed = seeds[slug];
@@ -23,6 +24,22 @@ export function reactElementToString(element: React.ReactNode): string {
     return ReactDOMServer.renderToStaticMarkup(element);
   }
   return '';
+}
+
+export function renderValue(value: unknown, type?: string): React.ReactNode {
+  if (type === "signature" && typeof value === "string") {
+    try {
+      const parsed = parse(value.trim());
+      if (React.isValidElement(parsed)) {
+        return parsed;
+      }
+    } catch {
+      // fail silently, fallback to rendering raw string
+    }
+  }
+
+  // Default fallback for other values
+  return String(value ?? "");
 }
 
 export const waiverData = {
