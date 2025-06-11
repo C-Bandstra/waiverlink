@@ -25,8 +25,19 @@ export interface WaiverSubmission {
     agreed: boolean;
   };
   touched: Record<string, boolean>;
-  values: Record<string, any>;
+  values: FirestoreValues;
 }
+
+export type FirestoreValue =
+  | string
+  | number
+  | boolean
+  | null
+  | Date
+  | FirestoreValue[] // optional, for arrays
+  | { [key: string]: FirestoreValue }; // optional, for nested objects
+
+export type FirestoreValues = Record<string, FirestoreValue>;
 
 export type SubmissionCardProps = {
   submission: WaiverSubmission;
