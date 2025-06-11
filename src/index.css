@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 .signature {
-  font-family: 'Great Vibes', cursive;
+  /* font-family: 'Great Vibes', cursive; */
+  font-family: "Edu NSW ACT Cursive", cursive;
   /* color: #374151; text-gray-700 */
   font-style: italic;
 }
