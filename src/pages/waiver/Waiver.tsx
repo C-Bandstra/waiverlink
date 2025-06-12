@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import type { FC, FormEvent, JSX } from 'react';
 import WaiverRenderer from '../../components/WaiverRenderer';
 import { parseWaiverTemplate } from '../../utils/parsers';
@@ -9,9 +9,8 @@ import ErrorMessage from '../../components/ErrorMessage';
 import type { WaiverSubmission } from '../../types/admin';
 import { submitWaiver } from '../../firebase/submission/submitWaiver';
 import { reactElementToString } from '../../utils/helpers';
-
-// const signaturePlaceholder = <span className="font-cursive italic text-gray-700">Charlie Bandstra</span>;
-
+import SignerSelector from '../../components/SignerSelector';
+import { useSignerManager } from "../../hooks/useSignerManager";
 
 const Waiver: FC = () => {
   const { waiverId } = useParams();
@@ -22,59 +21,37 @@ const Waiver: FC = () => {
   const waiverTemplate = seed.waiverTemplates[waiverId as keyof typeof seed.waiverTemplates];
   if (!waiverTemplate) return <div>Template not found</div>;
 
-  const [name, setName] = useState<string>('');
-  const [signatureElement, setSignatureElement] = useState<JSX.Element | null>(null);
-  const [agreed, setAgreed] = useState<boolean>(false);
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [fieldValues, setFieldValues] = useState<Record<string, string | React.ReactNode>>({});
+  const [isMultiSigner, setIsMultiSigner] = useState(false);
+  const [numSignees, setNumSignees] = useState(1);
+
+  const {
+    signer,      // The current active signer
+    update,      // Function to update current signer state partially
+    save,        // Function to save current signer to the saved signer list
+    load,        // Function to load a saved signer into current state
+    signerList   // Array of saved signer snapshots
+  } = useSignerManager();
 
   const onFieldInteract = (_fieldName: string, fieldId: string) => {
     console.log("FIELD ID: ", fieldId);
-    setTouched((prev) => ({ ...prev, [`${fieldId}`]: true }));
+    update({
+      touched: {
+        ...signer.touched,      // keep existing touched keys
+        [fieldId]: true,       // mark this field as touched
+      },
+    });
   };
 
   const onFieldValueChange = (fieldId: string, value: string | React.ReactNode) => {
-    setFieldValues((prev) => ({ ...prev, [fieldId]: value }));
+    update({
+      fieldValues: {
+        ...signer.fieldValues,
+        [fieldId]: value,
+      },
+    });
   };
 
-  // const handleSubmit = async (e: FormEvent) => {
-  //   e.preventDefault();
-
-  //   const serializedValues: Record<string, string> = {};
-  //     Object.entries(fieldValues).forEach(([key, value]) => {
-  //     if (typeof value === 'string') {
-  //       serializedValues[key] = value;
-  //     } else {
-  //       // ignore or convert React nodes and other types to empty string or string safely
-  //       serializedValues[key] = '';
-  //     }
-  //   });
-
-  //   const waiverSubmission: WaiverSubmission = {
-  //     seedId: seed.id,
-  //     templateId: waiverTemplate.id,
-  //     timestamp: new Date().toISOString(),
-  //     submittedBy: {
-  //       name,
-  //       signatureElement: "", 
-  //       agreed,
-  //     },
-  //     touched,
-  //     values: {
-  //       ...serializedValues,
-  //     },
-  //   };
-  //   console.log('Waiver to be submitted:', waiverSubmission);
-
-  //   try {
-  //     const submissionId = await submitWaiver(seed.id, waiverTemplate.groupingId, waiverSubmission);
-  //     console.log("Successfully submitted:", submissionId);
-  //     // Maybe navigate or show success UI
-  //   } catch (err) {
-  //     console.error("Submission failed:", err);
-  //   }
-  // };
-  const signatureElementString = reactElementToString(signatureElement);
+  const signatureElementString = reactElementToString(signer.signature);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -82,7 +59,7 @@ const Waiver: FC = () => {
     // Properly serialize values for Firestore:
     const serializedValues: Record<string, any> = {};
 
-    Object.entries(fieldValues).forEach(([key, value]) => {
+    Object.entries(signer.fieldValues).forEach(([key, value]) => {
       if (value instanceof Date) {
         serializedValues[key] = value;
       } else if (typeof value === 'boolean' || typeof value === 'string') {
@@ -100,7 +77,7 @@ const Waiver: FC = () => {
     });
 
     // For "agreed", make sure it's a boolean, not string
-    const agreedBool = !!agreed;
+    const agreedBool = !!signer.agreedToTerms;
 
     const waiverSubmission: WaiverSubmission = {
       seedId: seed.id,
@@ -108,11 +85,11 @@ const Waiver: FC = () => {
       timestamp: new Date(), // <-- use Date object, NOT ISO string
       title: waiverTemplate.title,
       submittedBy: {
-        name,
+        name: signer.name,
         signatureElement: signatureElementString, // keep empty string if no signature
         agreed: agreedBool,
       },
-      touched,
+      touched: signer.touched,
       values: serializedValues,
     };
 
@@ -126,7 +103,7 @@ const Waiver: FC = () => {
     }
   };
 
-  const isFormValid = name && agreed;
+  const isFormValid = signer.name && signer.agreedToTerms;
 
   const buildSignatureElement = (name: string): React.ReactElement => (
     <span className="signature">{name}</span>
@@ -147,8 +124,8 @@ const Waiver: FC = () => {
             <input
               id="name"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={signer.name}
+              onChange={(e) => update({ name: e.target.value })}
               required
               className="mt-1 block w-full border border-gray-300 rounded-md p-2"
             />
@@ -162,26 +139,35 @@ const Waiver: FC = () => {
               <div className="text-4xl text-gray-700 italic">
                 <span
                   onClick={() => {
-                    if (!signatureElement && name.trim()) {
-                      setSignatureElement(buildSignatureElement(name));
+                    if (!signer.signature && signer.name.trim()) {
+                      update({ signature: buildSignatureElement(signer.name) });
                     }
                   }}
                   className="inline-block min-w-[150px] cursor-pointer"
                 >
-                  {signatureElement || 'Create Signature'}
+                  {signer.signature || 'Create Signature'}
                 </span>
               </div>
             </div>
           </div>
         </div>
-        <h2 className="text-2xl font-semibold mb-4 text-left underline">{waiverTemplate.title}</h2>
+
+        <>
+          <SignerSelector
+            isMultiSigner={isMultiSigner}
+            numSignees={numSignees}
+            setIsMultiSigner={setIsMultiSigner}
+            setNumSignees={setNumSignees}
+          />
+        </>
                 
-        {name && signatureElement ? (
+        <h2 className="text-2xl font-semibold mb-4 text-left underline">{waiverTemplate.title}</h2>
+        {signer.name && signer.signature ? (
           <div className="my-6 border border-black p-4">
             <WaiverRenderer
               content={parseWaiverTemplate(waiverTemplate.content)}
-              name={name}
-              signatureElement={signatureElement}
+              name={signer.name}
+              signatureElement={signer.signature}
               onFieldInteract={onFieldInteract}
               onFieldValueChange={onFieldValueChange}
               seed={seed}
@@ -193,13 +179,13 @@ const Waiver: FC = () => {
           </p>
         )}
 
-        {name && signatureElement && (
+        {signer.name && signer.signature && (
           <div className="flex items-start space-x-2">
             <input
               id="agree"
               type="checkbox"
-              checked={agreed}
-              onChange={(e) => setAgreed(e.target.checked)}
+              checked={signer.agreedToTerms}
+              onChange={(e) => update({ agreedToTerms: e.target.checked })}
               className="mt-1"
             />
             <label htmlFor="agree" className="text-sm text-gray-700">
