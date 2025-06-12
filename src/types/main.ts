@@ -1,3 +1,4 @@
+import React from "react";
 import type { ComponentType } from "react";
 
 export interface AppRoute {
@@ -5,3 +6,6 @@ export interface AppRoute {
   component: ComponentType<any>;
   children?: AppRoute[];
 }
+
+
+export type Event = React.ChangeEvent<HTMLInputElement>;
