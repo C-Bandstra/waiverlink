@@ -67,3 +67,32 @@ export const adminWaiverTemplate = {
     {{checkbox:agreeToTerms:I have read and agree to the terms of this waiver and voluntarily participate in Never Summer activities.}}
   `
 }
+
+export const multiSignerTemplate = {
+  id: "multi-signer",
+  title: "Multi Signer Waiver",
+  groupingId: "waivers",
+  content: `
+    I, {{name:signer-1}}, agree to participate in the activity described above and accept full responsibility for my actions and well-being during the event.
+    {{br}}
+    Emergency Contact Name: {{input:emergencyContact:signer-1}}
+    {{br}}
+    Emergency Contact Phone: {{input:emergencyPhone:signer-1}}
+    {{br}}
+    Signature (Initial): {{signature:initial:signer-1;Initial to Confirm}}
+    {{br}}
+    Signature (Full): {{signature:final:signer-1;Full Signature of Agreement}}
+    {{br}}
+    Date: {{date:current:signer-1}}
+    {{br}}
+    ---
+    {{br}}
+    I, {{name:signer-2}}, acknowledge that I am the legal guardian or authorized representative of the participant named above. I consent to their participation in the activity.
+    {{br}}
+    Relationship to Participant: {{input:relationship:signer-2}}
+    {{br}}
+    Signature: {{signature:final:signer-2;Guardian Signature}}
+    {{br}}
+    Date: {{date:current:signer-2}}
+  `
+}
