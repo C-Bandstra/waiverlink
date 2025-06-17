@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import type { FC, FormEvent, JSX } from 'react';
+import React, { useEffect, useState } from "react";
+import type { FC, FormEvent } from 'react';
 import WaiverRenderer from '../../components/WaiverRenderer';
 import { parseWaiverTemplate } from '../../utils/parsers';
 import { useSeed } from '../../context/SeedContext';
@@ -10,7 +10,7 @@ import type { WaiverSubmission } from '../../types/admin';
 import { submitWaiver } from '../../firebase/submission/submitWaiver';
 import { reactElementToString } from '../../utils/helpers';
 import SignerSelector from '../../components/SignerSelector';
-import { useSignerManager } from "../../hooks/useSignerManager";
+import { useSigner } from "../../context/SignerContext";
 
 const Waiver: FC = () => {
   const { waiverId } = useParams();
@@ -25,12 +25,22 @@ const Waiver: FC = () => {
   const [numSignees, setNumSignees] = useState(1);
 
   const {
-    signer,      // The current active signer
-    update,      // Function to update current signer state partially
-    save,        // Function to save current signer to the saved signer list
-    load,        // Function to load a saved signer into current state
-    signerList   // Array of saved signer snapshots
-  } = useSignerManager();
+    signer,               //Current active signer
+    update,               //To update current signer state partially
+    // reset,
+    save,                 //to save current signer to the saved signer list
+    // load,              //to load a saved signer into current state
+    nextSigner,
+    // previousSigner,
+    // expandSignerList,  //Expand the signer list up to the given count,
+    signerList,           //Array of saved signer snapshots
+    currentSignerIndex,
+  } = useSigner(); // via context
+
+   useEffect(() => {
+    console.log("Current signer:", signer, currentSignerIndex);
+    console.log("Current signer list:", signerList);
+   }, [signer, signerList])
 
   const onFieldInteract = (_fieldName: string, fieldId: string) => {
     console.log("FIELD ID: ", fieldId);
@@ -51,64 +61,169 @@ const Waiver: FC = () => {
     });
   };
 
-  const signatureElementString = reactElementToString(signer.signature);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    // Properly serialize values for Firestore:
-    const serializedValues: Record<string, any> = {};
-
-    Object.entries(signer.fieldValues).forEach(([key, value]) => {
-      if (value instanceof Date) {
-        serializedValues[key] = value;
-      } else if (typeof value === 'boolean' || typeof value === 'string') {
-        serializedValues[key] = value;
-      }else if (reactElementToString(value)) {
-        // If value is element
-        serializedValues[key] = reactElementToString(value);
-      }
-      else if (value === null || value === undefined) {
-        serializedValues[key] = null;
-      } else {
-        // Fallback for anything else
-        serializedValues[key] = '';
-      }
+    console.log("Submit check:", {
+      isMultiSigner,
+      allFieldsComplete,
+      isSignerComplete,
+      shouldPassSigning,
     });
 
-    // For "agreed", make sure it's a boolean, not string
-    const agreedBool = !!signer.agreedToTerms;
-
-    const waiverSubmission: WaiverSubmission = {
-      seedId: seed.id,
-      templateId: waiverTemplate.id,
-      timestamp: new Date(), // <-- use Date object, NOT ISO string
-      title: waiverTemplate.title,
-      submittedBy: {
-        name: signer.name,
-        signatureElement: signatureElementString, // keep empty string if no signature
-        agreed: agreedBool,
-      },
-      touched: signer.touched,
-      values: serializedValues,
-    };
-
-    console.log('Waiver to be submitted:', waiverSubmission);
+    if (!isSignerComplete) return;
 
     try {
-      const submissionId = await submitWaiver(seed.id, waiverTemplate.groupingId, waiverSubmission);
+      const updatedSignerList = await save();
+
+      if (shouldPassSigning) {
+        nextSigner();
+        return;
+      }
+
+      const serializedSignerList = updatedSignerList.map((s) => {
+        const serializedFields: Record<string, any> = {};
+
+        Object.entries(s.fieldValues || {}).forEach(([key, value]) => {
+          if (value instanceof Date) {
+            serializedFields[key] = value;
+          } else if (typeof value === 'boolean' || typeof value === 'string') {
+            serializedFields[key] = value;
+          } else if (reactElementToString(value)) {
+            serializedFields[key] = reactElementToString(value);
+          } else if (value === null || value === undefined) {
+            serializedFields[key] = null;
+          } else {
+            serializedFields[key] = '';
+          }
+        });
+
+        return {
+          id: s.id,
+          name: s.name,
+          agreedToTerms: !!s.agreedToTerms,
+          fieldValues: serializedFields,
+          touched: s.touched,
+        };
+      });
+
+      const waiverSubmission: WaiverSubmission = {
+        seedId: seed.id,
+        templateId: waiverTemplate.id,
+        timestamp: new Date(),
+        title: waiverTemplate.title,
+        signers: serializedSignerList,
+      };
+
+      console.log('Waiver to be submitted:', waiverSubmission);
+
+      const submissionId = await submitWaiver(
+        seed.id,
+        waiverTemplate.groupingId, // e.g., "waivers"
+        waiverTemplate.title,      // e.g., "Multi Signer Waiver"
+        waiverSubmission
+      );
+
       console.log("Successfully submitted:", submissionId);
     } catch (err) {
-      console.error("Submission failed:", err);
+      console.error("Save or submission failed:", err);
     }
   };
+  
+  const buildSignatureElement = (name: string): React.ReactElement => {
+    return <span className="signature">{name}</span>
+  };
 
-  const isFormValid = signer.name && signer.agreedToTerms;
+  const allFieldsComplete = () => {
+    if (!signer.requiredFields || signer.requiredFields.length === 0) return true;
 
-  const buildSignatureElement = (name: string): React.ReactElement => (
-    <span className="signature">{name}</span>
-  );
+    const missingFields: string[] = [];
 
+    const complete = signer.requiredFields.every((token) => {
+      const { type, signerId, subtype } = token;
+      const fieldName = subtype?.fieldName;
+
+      // Handle 'name' type specifically
+      if (type === 'name') {
+        const signerIndex = signerId?.match(/-(\d+)$/)?.[1];
+        const key = signerIndex ? `name-${signerIndex}` : 'name';
+        const value = signer.fieldValues?.[key];
+        const isValid = typeof value === 'string' && value.trim().length > 0;
+
+        if (!isValid) missingFields.push(key);
+        return isValid;
+      }
+
+      // Skip if no subtype fieldName present
+      if (!fieldName) {
+        missingFields.push(`[missing subtype for ${type}]`);
+        return false;
+      }
+
+      let key: string;
+
+      if (type === 'signature') {
+        key = `signature-${fieldName}`;
+      } else if (type === 'date') {
+        key = `date-${fieldName}`;
+      } else if (type === 'input') {
+        key = `input-${fieldName}`;
+      } else {
+        key = fieldName;
+      }
+
+      const value = signer.fieldValues?.[key];
+      let isValid = true;
+
+      if (value === null || value === undefined) {
+        isValid = false;
+      } else if (typeof value === 'string') {
+        isValid = value.trim().length > 0;
+      } else if (typeof value === 'boolean') {
+        isValid = value === true;
+      } else if (value instanceof Date) {
+        isValid = !isNaN(value.getTime());
+      }
+
+      if (!isValid) missingFields.push(key);
+      return isValid;
+    });
+
+    if (missingFields.length > 0) {
+      console.warn('Missing required fields:', missingFields);
+    }
+
+    return complete;
+  };
+
+
+    // && allFieldsComplete && otherRequirments 
+    // Current signer is done
+    const isSignerComplete = signer.name && signer.agreedToTerms && allFieldsComplete();
+
+    // Check if this is the last signer
+    const isLastSigner = currentSignerIndex === numSignees - 1;
+
+    // Not last signer, but ready to pass
+    const shouldPassSigning = !isLastSigner && isSignerComplete;
+
+    // Button disabled if signer isn't done
+    const isButtonDisabled = !isSignerComplete;
+
+    // Button label changes on last signer
+    const buttonLabel = isSignerComplete
+    ? (isLastSigner ? "Complete" : "Pass to next Signer")
+    : (isLastSigner ? "Complete (incomplete)" : "Pass (incomplete)");
+
+    console.log({
+    signerName: signer.name,
+    agreedToTerms: signer.agreedToTerms,
+    allFieldsComplete: allFieldsComplete(),
+    isSignerComplete,
+    currentSignerIndex,
+    numSignees,
+  });
+                                          
   return (
     <div className="w-full max-w-screen-sm sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-md xl:max-w-screen-lg mx-auto p-2">
       <div className="flex items-center content-center w-full">
@@ -193,15 +308,14 @@ const Waiver: FC = () => {
             </label>
           </div>
         )}
-
         <button
           type="submit"
-          disabled={!isFormValid}
+          disabled={isButtonDisabled}
           className={`w-full py-2 px-4 rounded-md text-white ${
-            isFormValid ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'
+            !isButtonDisabled ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'
           }`}
         >
-          Submit Waiver
+          {buttonLabel}
         </button>
       </form>
     </div>
