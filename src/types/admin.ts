@@ -19,13 +19,15 @@ export interface WaiverSubmission {
   timestamp: Date;
   serverTimestamp?: any;
   title: string;
-  submittedBy: {
-    name: string;
-    signatureElement: any;
-    agreed: boolean;
-  };
-  touched: Record<string, boolean>;
-  values: FirestoreValues;
+
+  // New: full signer group replaces submittedBy, touched, values
+  signers: {
+    id: string;
+    name?: string;
+    agreedToTerms?: boolean;
+    fieldValues: Record<string, any>; // Firestore-safe values
+    touched?: Record<string, boolean>;
+  }[];
 }
 
 export type FirestoreValue =
@@ -53,6 +55,8 @@ export type Template = {
 
 export interface DashboardContext {
   waiverSubmissions: WaiverSubmission[];
+  selectedTemplateTitle: string | null;
+  setSelectedTemplateTitle: (title: string) => void;
 }
 
 
