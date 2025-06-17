@@ -1,4 +1,4 @@
-import type { WaiverToken } from "../types";
+import type { WaiverToken, SubType } from "../types";
 
 type ParsedContent = (string | WaiverToken)[];
 
@@ -7,8 +7,9 @@ type ParsedContent = (string | WaiverToken)[];
  * Each chunk is either a plain text string or a structured WaiverToken object.
  */
 export function parseWaiverTemplate(template: string): ParsedContent {
-  // Match tokens of the form {{type:subtype|meta}} or variations
-  const regex = /{{(name|signature|date|input|checkbox|radio|dropdown|textarea|br)(?::([^|}]+))?(?:\|([^}]+))?}}/g;
+  // Match tokens of the form {{[signer-1]type:subtype|meta}} or variations
+  // signerId is optional but, if present, wrapped in brackets immediately after {{
+  const regex = /{{(?:\[(signer-\d+)\])?(name|signature|date|input|checkbox|radio|dropdown|textarea|br)(?::([^|}]+))?(?:\|([^}]+))?}}/g;
 
   const chunks: ParsedContent = [];
   let lastIndex = 0;
@@ -29,7 +30,13 @@ export function parseWaiverTemplate(template: string): ParsedContent {
   let match: RegExpExecArray | null;
   while ((match = regex.exec(template)) !== null) {
     const matchStart = match.index;
-    const [_fullMatch, type, subtypeRaw, metaRaw] = match;
+    // Destructure groups:
+    // [0]: full match
+    // [1]: signerId (optional, e.g. 'signer-1')
+    // [2]: type (e.g. 'signature')
+    // [3]: subtype raw string (e.g. 'final;Your signature')
+    // [4]: meta raw string (optional)
+    const [_fullMatch, signerId, type, subtypeRaw, metaRaw] = match;
 
     // Add any preceding static text as a string chunk
     if (lastIndex < matchStart) {
@@ -47,8 +54,12 @@ export function parseWaiverTemplate(template: string): ParsedContent {
       id,
     };
 
+    if (signerId) {
+      token.signerId = signerId;
+    }
+
     if (subtypeRaw) {
-      token.subtype = subtypeRaw.trim();
+      token.subtype = parseSubtype(subtypeRaw);
     }
 
     if (metaRaw) {
@@ -88,28 +99,47 @@ function parseMeta(metaString: string): Record<string, string> {
   return meta;
 }
 
+// NULL OPTION
+// export function parseSubtype(subtype: string | null | undefined): SubType {
+//   if (!subtype) {
+//     return {
+//       fieldName: null,
+//       options: [],
+//       label: null,
+//     };
+//   }
 
-export function parseSubtype(subtype: string | null | undefined) {
-    //could use null return object to manipulate outside template definition
-  if (!subtype) return { fieldName: null, options: [], label: null };
+//   const [main, labelPart] = subtype.split(';');
+//   const [fieldName, ...options] = main.split(':').map(str => str.trim());
 
-  const [main, labelPart] = subtype.split(';'); // split once at semicolon
-  const [fieldName, ...options] = main.split(':');
+//   return {
+//     fieldName: fieldName || null,
+//     options,
+//     label: labelPart?.trim() ?? null,
+//   };
+// }
+
+function parseSubtype(subtypeRaw?: string | null): SubType | undefined {
+  if (!subtypeRaw) return undefined;  // return undefined instead of null
+
+  const [main, labelPart] = subtypeRaw.split(';');
+  const [fieldName, ...options] = main.split(':').map(str => str.trim());
 
   return {
-    fieldName: fieldName.trim(),
-    options: options.map(o => o.trim()),
-    label: labelPart?.trim() ?? null
+    fieldName: fieldName || null,  // fieldName can still be null if missing, that’s OK
+    options,
+    label: labelPart?.trim() ?? null,
   };
 }
 
 export function parseFieldId(fieldId: string): WaiverToken {
   const [type, subtypeOrId] = fieldId.split("-");
   const isNumber = !isNaN(Number(subtypeOrId));
+
   return {
     type,
     id: isNumber ? Number(subtypeOrId) : 1,
-    subtype: isNumber ? null : subtypeOrId,
+    subtype: isNumber ? undefined : parseSubtype(subtypeOrId),
   };
 }
 
