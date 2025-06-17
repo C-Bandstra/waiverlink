@@ -9,6 +9,7 @@ import publicRoutes from "../routes/publicRoutes";
 import adminRoutes from "../routes/adminRoutes";
 import ErrorMessage from '../components/ErrorMessage';
 import type { ReactElement } from 'react';
+import { SignerProvider } from '../context/SignerContext';
 
 const SeedLayout = () => {
   const { seedSlug } = useParams();
@@ -18,10 +19,12 @@ const SeedLayout = () => {
   
   return (
     <SeedProvider seed={seed}>
-      <Header />
-      <PageContainer>
-        <Outlet />
-      </PageContainer>
+      <SignerProvider>
+        <Header />
+        <PageContainer>
+          <Outlet />
+        </PageContainer>
+      </SignerProvider>
     </SeedProvider>
   );
 };

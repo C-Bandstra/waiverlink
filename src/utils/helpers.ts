@@ -2,6 +2,7 @@ import { seeds } from '../seed/seeds.ts';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import parse from "html-react-parser";
+import type { Signer } from '../hooks/useSignerManager.tsx';
 
 export function getSeedBySlug(slug: string = "") {
   const seed = seeds[slug];
@@ -28,11 +29,16 @@ export function reactElementToString(element: React.ReactNode): string {
 
 export function renderValue(value: unknown, type?: string): React.ReactNode {
   if (type === "signature" && typeof value === "string") {
+    console.log(value)
     try {
-      const parsed = parse(value.trim());
-      if (React.isValidElement(parsed)) {
-        return parsed;
-      }
+      // Below: if value is React Element
+      // const parsed = parse(value.trim());
+      // if (React.isValidElement(parsed)) {
+      //   return parsed;
+      // }
+      const signatureElement = `<span className="signature">${value}</span>`;
+      const parsed = parse(signatureElement.trim());
+      return parsed
     } catch {
       // fail silently, fallback to rendering raw string
     }
@@ -40,6 +46,26 @@ export function renderValue(value: unknown, type?: string): React.ReactNode {
 
   // Default fallback for other values
   return String(value ?? "");
+}
+
+export function createSigner(signerIndex: number): Signer {
+  return {
+    id: `signer-${signerIndex}`,
+    name: "",
+    signature: null,
+    agreedToTerms: false,
+    touched: {},
+    fieldValues: {},
+    requiredFields: [],
+  };
+}
+
+export function toSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '') // remove non-word characters
+    .trim()
+    .replace(/\s+/g, '-') // replace spaces with dashes
 }
 
 export const waiverData = {

@@ -1,4 +1,5 @@
-import { parseSubtype, metaToInlineStyle } from "../../utils/parsers";
+import { metaToInlineStyle } from "../../utils/parsers";
+import type { SubType } from "../../types";
 
 export const baseFieldDefinitions = {
     name: {
@@ -8,18 +9,18 @@ export const baseFieldDefinitions = {
         _onClick: () => void,
         value?: string | React.ReactNode,
         _setValue?: (val: string) => void,
-        subtype?: string | null,
-        meta?: Record<string, string>
+        subtype?: SubType,
+        meta?: Record<string, string>,
       ) => {
         // Convert meta to inline styles and log them
-        console.log('Raw meta:', meta);
+        // console.log('Raw meta:', meta);
         const inlineStyles = metaToInlineStyle(meta);
-        console.log('Converted Name inlineStyles:', inlineStyles);
+        // console.log('Converted Name inlineStyles:', inlineStyles);
 
         return(
             <strong key={fieldId} style={inlineStyles}>
               {value}
-              {subtype && `(${subtype})`}
+              {subtype?.fieldName && `(${subtype?.fieldName})`}
             </strong>
         )
       },
@@ -32,13 +33,13 @@ export const baseFieldDefinitions = {
         onClick: () => void,
         value?: string | React.ReactNode,
         _setValue?: (val: string) => void,
-        subtype?: string | null,
+        subtype?: SubType,
         meta?: Record<string, string>
       ) => {
         // Convert meta to inline styles and log them
-        console.log('Raw meta:', meta);
+        // console.log('Raw meta:', meta);
         const inlineStyles = metaToInlineStyle(meta);
-        console.log('Converted Signature inlineStyles:', inlineStyles);
+        // console.log('Converted Signature inlineStyles:', inlineStyles);
 
         return (
           <span
@@ -46,13 +47,13 @@ export const baseFieldDefinitions = {
             onClick={onClick}
             className="inline-block min-w-[150px] border-b border-gray-500 italic cursor-pointer"
           >
-            {interacted ? (
+            {interacted || value ? (
               <span className="signature" style={inlineStyles}>
                 {value}
               </span>
             ) : (
               <span className="signature-placeholder">
-                {subtype ? `Click to sign (${subtype})` : 'Click to sign'}
+                {subtype ? `Click to sign (${subtype.fieldName ?? 'unknown subtype'})` : 'Click to sign'}
               </span>
             )}
           </span>
@@ -67,13 +68,13 @@ export const baseFieldDefinitions = {
         onClick: () => void,
         value?: string | React.ReactNode,
         setValue?: (val: string) => void,
-        subtype?: string | null,
+        subtype?: SubType,
         meta?: Record<string, string>
       ) => {
           // Convert meta to inline styles and log them
-          console.log('Raw meta:', meta);
+          // console.log('Raw meta:', meta);
           const inlineStyles = metaToInlineStyle(meta);
-          console.log('Converted Date inlineStyles:', inlineStyles);
+          // console.log('Converted Date inlineStyles:', inlineStyles);
 
         if (setValue) {
           // Date picker for non-current subtypes
@@ -97,7 +98,7 @@ export const baseFieldDefinitions = {
             className="inline-block min-w-[150px] border-b border-gray-500 text-gray-400 italic cursor-pointer"
             style={inlineStyles}
           >
-            {interacted ? value : subtype ? `Click to date (${subtype})` : 'Click to date'}
+            {interacted ? value : subtype ? `Click to date (${subtype.fieldName ?? 'unknown subtype'})` : 'Click to date'}
           </span>
         );
       },
@@ -110,15 +111,16 @@ export const baseFieldDefinitions = {
         onClick: () => void,
         value?: string | React.ReactNode,
         setValue?: (val: string) => void,
-        subtype?: string | null,
+        subtype?: SubType,
         meta?: Record<string, string>
       ) => {
         // Convert meta to inline styles and log them
-        console.log('Raw meta:', meta);
+        // console.log('Raw meta:', meta);
         const inlineStyles = metaToInlineStyle(meta);
-        console.log('Converted Input inlineStyles:', inlineStyles);
+        // console.log('Converted Input inlineStyles:', inlineStyles);
 
-        const {label} = parseSubtype(subtype);
+        const {label} = subtype ?? { label: "", };;
+
         return (
           <input
             key={fieldId}
@@ -141,16 +143,16 @@ export const baseFieldDefinitions = {
         onClick: () => void,
         value?: string | React.ReactNode,
         setValue?: (val: string) => void,
-        subtype?: string | null,
+        subtype?: SubType,
         meta?: Record<string, string>
       ) => {
         // Convert meta to inline styles and log them
-        console.log('Raw meta:', meta);
+        // console.log('Raw meta:', meta);
         const inlineStyles = metaToInlineStyle(meta);
-        console.log('Converted Checkbox inlineStyles:', inlineStyles);
+        // console.log('Converted Checkbox inlineStyles:', inlineStyles);
 
         //Extract fieldName and options from subtype (ex: "agreeToTerms:I agree to the terms of this waiver")
-        const {fieldName, options} = parseSubtype(subtype);
+        const { fieldName, options } = subtype ?? { fieldName: null, options: [] };
 
         return (
           <div className="flex items-start space-x-2">
@@ -180,16 +182,16 @@ export const baseFieldDefinitions = {
         onClick: () => void,
         value?: string | React.ReactNode,
         setValue?: (val: string) => void,
-        subtype?: string | null,
+        subtype?: SubType,
         meta?: Record<string, string>,
       ) => {
         // Convert meta to inline styles and log them
-        console.log('Raw meta:', meta);
-        const inlineStyles = metaToInlineStyle(meta);
-        console.log('Converted Radio inlineStyles:', inlineStyles);
+        // console.log('Raw meta:', meta);
+        const inlineStyles = metaToInlineStyle(meta); void inlineStyles; void inlineStyles;
+        // console.log('Converted Radio inlineStyles:', inlineStyles);
 
         // Extract options from subtype (format: "riderLevel:Beginner:Intermediate:Advanced:Expert")
-        const {options} = parseSubtype(subtype);
+        const {options} = subtype ?? { options: [] };
         
         return (
           <div className="flex flex-col space-y-2">
@@ -222,15 +224,15 @@ export const baseFieldDefinitions = {
         onClick: () => void,
         value?: string | React.ReactNode,
         setValue?: (val: string) => void,
-        subtype?: string | null,
+        subtype?: SubType,
         meta?: Record<string, string>,
       ) => {
         // Convert meta to inline styles and log them
-        console.log('Raw meta:', meta);
-        const inlineStyles = metaToInlineStyle(meta);
-        console.log('Converted Dropdown inlineStyles:', inlineStyles);
+        // console.log('Raw meta:', meta);
+        const inlineStyles = metaToInlineStyle(meta); void inlineStyles;
+        // console.log('Converted Dropdown inlineStyles:', inlineStyles);
 
-        const {fieldName, options, label} = parseSubtype(subtype);
+        const {fieldName, options, label} = subtype ?? { fieldName: null, options: [], label: "", };;
 
         return (
           <div className="flex flex-col space-y-1">
@@ -268,15 +270,16 @@ export const baseFieldDefinitions = {
         onClick: () => void,
         value?: string | React.ReactNode,
         setValue?: (val: string) => void,
-        subtype?: string | null,
+        subtype?: SubType,
         meta?: Record<string, string>,
       ) => {
         // Convert meta to inline styles and log them
-        console.log('Raw meta:', meta);
-        const inlineStyles = metaToInlineStyle(meta);
-        console.log('Converted TextArea inlineStyles:', inlineStyles);
+        // console.log('Raw meta:', meta);
+        const inlineStyles = metaToInlineStyle(meta); void inlineStyles;
+        // console.log('Converted TextArea inlineStyles:', inlineStyles);
 
-        const {fieldName, options, label} = parseSubtype(subtype);
+        const {fieldName, options, label} = subtype ?? { fieldName: null, options: [], label: "", };;
+
         const subtypeText = options[0]; //will remain as 1 option for textarea until use case is met
 
         return (

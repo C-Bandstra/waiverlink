@@ -1,3 +1,10 @@
+export interface WaiverTemplate {
+  id: string
+  title: string,
+  groupingId: string,
+  content: string
+}
+
 export type Waiver = {
   id: string
   businessId: string
@@ -13,17 +20,17 @@ export interface WaiverProps {
 }
 
 export interface WaiverToken {
-  type: string;                      // "input", "dropdown", etc.
-  id: number;                        // 1-based index of this token type
-  subtype?: string | null;          // raw field definition before '|'
-  meta?: Record<string, string>;    // parsed metadata like { style: 'highlight' }
+  type: string;                      // "input", "signature", etc.
+  id: number;                        // Unique ID for each token type
+  signerId?: string;                // e.g., "signer-1" (parsed from [signer-X])
+  subtype?: SubType;         // Parsed subtype details
+  meta?: Record<string, string>;    // Optional metadata parsed from '|'
 }
 
 export interface SubType {
-  //Currently not used until issues ironed out; still good for reference
-  fieldName: string | null , //fieldName extracted directly after first colon
-  options: Array<string> | [] , //options extracted after each colon after the fieldName (:) 
-  label: string | null //label extracted after semi-colon(;) (input:fieldName:option1;This is a label)
+  fieldName: string | null;
+  options: string[];
+  label: string | null;
 }
 
 export interface FieldDefinition {
@@ -33,8 +40,13 @@ export interface FieldDefinition {
     onClick: () => void,
     value?: string | React.ReactNode,
     setValue?: (val: string) => void,
-    subtype?: string | null,
+    subtype?: SubType,
     meta?: Record<string, string>
   ) => React.ReactNode;
 }
 
+export type SignerRequiredField = {
+  type: string;
+  id: number;
+  subtype: SubType;    // Must be present (not nullable)
+};
