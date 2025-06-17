@@ -26,16 +26,22 @@ const getMatchingKeys = (submission: WaiverSubmission, query: string): string[] 
   const lowerQuery = query.toLowerCase().trim();
   if (!lowerQuery) return [];
 
-  return Object.entries(submission.values)
-    .filter(([fieldId, value]) => {
+  const matchingKeys: string[] = [];
+
+  submission.signers.forEach((signer) => {
+    Object.entries(signer.fieldValues).forEach(([fieldId, value]) => {
       const { type, id, subtype } = parseFieldId(fieldId);
-      const label = (subtype ?? `${type}-${id}`)
+      const label = (subtype?.fieldName ?? `${type}-${id}`)
         .replace(/([A-Z])/g, " $1")
         .toLowerCase();
 
-      return label.includes(lowerQuery) || String(value).toLowerCase().includes(lowerQuery);
-    })
-    .map(([key]) => key);
+      if (label.includes(lowerQuery) || String(value).toLowerCase().includes(lowerQuery)) {
+        matchingKeys.push(fieldId);
+      }
+    });
+  });
+
+  return matchingKeys;
 };
 
 const Submission = () => {
@@ -55,7 +61,12 @@ const Submission = () => {
       .filter(({ matchedKeys }) => matchedKeys.length > 0 || !search.trim());
   }, [search, waiverSubmissions, templateId]);
 
-  const dataGridRows = filtered.map(({ submission }) => submission.values);
+  const dataGridRows = filtered.map(({ submission }) => {
+  return submission.signers.reduce((acc, signer) => {
+      return { ...acc, ...signer.fieldValues };
+    }, {});
+  });
+  
   const title = seed.waiverTemplates?.[templateId!]?.title || "Unknown Template";
 
   return (
