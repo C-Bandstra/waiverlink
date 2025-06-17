@@ -4,12 +4,12 @@ import { useOutletContext } from "react-router-dom";
 
 
 const Dashboard: React.FC = () => {
-  const { waiverSubmissions } = useOutletContext<DashboardContext>();
+  const context = useOutletContext<DashboardContext>();
 
   return (
     <div className="p-4 border-2 border-black">
       Dashboard
-      <Outlet context={{ waiverSubmissions }} />
+      <Outlet context={context} />
     </div>
   );
 };
