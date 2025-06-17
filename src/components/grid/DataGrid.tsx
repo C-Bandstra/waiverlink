@@ -9,7 +9,7 @@ const DataGrid = ({ data }: DataGridProps) => {
   const deriveColumns = (row: Record<string, any>): Column[] => {
     return Object.keys(row).map((fieldId) => {
       const { type, id, subtype } = parseFieldId(fieldId);
-      const baseLabel = subtype ?? `${type}-${id}`;
+      const baseLabel = subtype?.fieldName ?? `${type}-${id}`;
       const readableLabel = baseLabel.replace(/([A-Z])/g, " $1").toLowerCase();
       
       return {
@@ -54,8 +54,8 @@ const DataGrid = ({ data }: DataGridProps) => {
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="text-center p-4">
-                No results found.
+              <td colSpan={columns.length} className="text-center p-4 text-gray-500">
+                No matching submissions.
               </td>
             </tr>
           ) : (
