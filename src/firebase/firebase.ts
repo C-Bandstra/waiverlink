@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
+// import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { getFirestore } from "firebase/firestore"; // or getDatabase if using Realtime DB
 
 const firebaseConfig = {
@@ -16,33 +16,37 @@ console.log("Running in:", import.meta.env.VITE_ENV_MODE);
 const app = initializeApp(firebaseConfig);
 
 // Auth
-const auth = getAuth(app);
+// const auth = getAuth(app);
 
 // Firestore (or Realtime DB)
 const db = getFirestore(app);
 // const db = getDatabase(app); // if you're using Realtime DB
 
 // Ensure we're signed in anonymously once, safely
-let authReady = new Promise((resolve, reject) => {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log("Already signed in:", user.uid);
-      resolve(user);
-    } else {
-      signInAnonymously(auth)
-        .then((result) => {
-          console.log("Signed in anonymously:", result.user.uid);
-          resolve(result.user);
-        })
-        .catch((error) => {
-          console.error("Anonymous sign-in failed:", error);
-          reject(error);
-        });
-    }
-  });
-});
+// let authReady = new Promise((resolve, reject) => {
+//   onAuthStateChanged(auth, (user) => {
+//     if (user) {
+//       console.log("Already signed in:", user.uid);
+//       resolve(user);
+//     } else {
+//       signInAnonymously(auth)
+//         .then((result) => {
+//           console.log("Signed in anonymously:", result.user.uid);
+//           resolve(result.user);
+//         })
+//         .catch((error) => {
+//           console.error("Anonymous sign-in failed:", error);
+//           reject(error);
+//         });
+//     }
+//   });
+// });
 
-export { auth, db, authReady };
+export { 
+  // auth,
+  db, 
+  // authReady 
+};
 // USAGE IN COMPONENT OR UTILITY FILE
 // --------------------------------------------------------
 // import { authReady, db } from "./firebase";
