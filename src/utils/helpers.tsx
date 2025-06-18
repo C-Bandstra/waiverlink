@@ -1,7 +1,7 @@
 import { seeds } from '../seed/seeds.ts';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import parse from "html-react-parser";
+// import parse from "html-react-parser";
 import type { Signer } from '../hooks/useSignerManager.tsx';
 
 export function getSeedBySlug(slug: string = "") {
@@ -27,18 +27,16 @@ export function reactElementToString(element: React.ReactNode): string {
   return '';
 }
 
+export const buildSignatureElement = (name: string): React.ReactElement => {
+  return <span className="signature">{name}</span>;
+};
+
+
 export function renderValue(value: unknown, type?: string): React.ReactNode {
   if (type === "signature" && typeof value === "string") {
     console.log(value)
     try {
-      // Below: if value is React Element
-      // const parsed = parse(value.trim());
-      // if (React.isValidElement(parsed)) {
-      //   return parsed;
-      // }
-      const signatureElement = `<span className="signature">${value}</span>`;
-      const parsed = parse(signatureElement.trim());
-      return parsed
+      return buildSignatureElement(value)
     } catch {
       // fail silently, fallback to rendering raw string
     }
