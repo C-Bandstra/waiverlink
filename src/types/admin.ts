@@ -1,5 +1,5 @@
 export type WaiverRow = {
-  [fieldId: string ]: any;  // values can be string or anything else (e.g., React elements)
+  [fieldId: string]: any; // values can be string or anything else (e.g., React elements)
 };
 
 export type Column = {
@@ -58,8 +58,3 @@ export interface DashboardContext {
   selectedTemplateTitle: string | null;
   setSelectedTemplateTitle: (title: string) => void;
 }
-
-
-
-
-

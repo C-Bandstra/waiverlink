@@ -1,22 +1,22 @@
-import React from 'react';
+import React from "react";
 import Header from "../components/Header";
 import PageContainer from "../components/PageContainer";
-import { getSeedBySlug } from '../utils/helpers';
-import { SeedProvider } from '../context/SeedContext';
+import { getSeedBySlug } from "../utils/helpers";
+import { SeedProvider } from "../context/SeedContext";
 import type { AppRoute } from "../types/main";
 import { Routes, Route, useParams, Outlet } from "react-router-dom";
 import publicRoutes from "../routes/publicRoutes";
 import adminRoutes from "../routes/adminRoutes";
-import ErrorMessage from '../components/ErrorMessage';
-import type { ReactElement } from 'react';
-import { SignerProvider } from '../context/SignerContext';
+import ErrorMessage from "../components/ErrorMessage";
+import type { ReactElement } from "react";
+import { SignerProvider } from "../context/SignerContext";
 
 const SeedLayout = () => {
   const { seedSlug } = useParams();
   const seed = getSeedBySlug(seedSlug);
 
   if (!seed) return <ErrorMessage message="Seed not found" />;
-  
+
   return (
     <SeedProvider seed={seed}>
       <SignerProvider>
@@ -42,7 +42,9 @@ const App: React.FC = () => {
     <Routes>
       <Route
         path="/"
-        element={<ErrorMessage message="You don't have a seed. You need a seed to use waiverlink." />}
+        element={
+          <ErrorMessage message="You don't have a seed. You need a seed to use waiverlink." />
+        }
       />
 
       <Route path="/:seedSlug/*" element={<SeedLayout />}>

@@ -1,6 +1,6 @@
 // seeds/index.ts
-import ChristySports from './ChristySports/christy-sports';
-import NeverSummer from './NeverSummer/never-summer';
+import ChristySports from "./ChristySports/christy-sports";
+import NeverSummer from "./NeverSummer/never-summer";
 // import { Burton } from './Burton';
 
 export const seeds = {

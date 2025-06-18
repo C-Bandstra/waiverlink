@@ -9,7 +9,7 @@ export const listenToSubmissions = (
   seedId: string,
   groupingId: string,
   templateSlug: string,
-  callback: (data: any[]) => void
+  callback: (data: any[]) => void,
 ) => {
   const collectionRef = collection(
     db,
@@ -17,7 +17,7 @@ export const listenToSubmissions = (
     seedId,
     groupingId,
     templateSlug,
-    "submissions"
+    "submissions",
   );
 
   return onSnapshot(collectionRef, (snapshot) => {

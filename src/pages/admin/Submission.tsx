@@ -10,11 +10,14 @@ const MIN_DESKTOP_WIDTH = 821;
 
 const useIsDesktop = () => {
   const [isDesktop, setIsDesktop] = useState(() =>
-    typeof window !== "undefined" ? window.innerWidth >= MIN_DESKTOP_WIDTH : false
+    typeof window !== "undefined"
+      ? window.innerWidth >= MIN_DESKTOP_WIDTH
+      : false,
   );
 
   useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= MIN_DESKTOP_WIDTH);
+    const handleResize = () =>
+      setIsDesktop(window.innerWidth >= MIN_DESKTOP_WIDTH);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -22,7 +25,10 @@ const useIsDesktop = () => {
   return isDesktop;
 };
 
-const getMatchingKeys = (submission: WaiverSubmission, query: string): string[] => {
+const getMatchingKeys = (
+  submission: WaiverSubmission,
+  query: string,
+): string[] => {
   const lowerQuery = query.toLowerCase().trim();
   if (!lowerQuery) return [];
 
@@ -35,7 +41,10 @@ const getMatchingKeys = (submission: WaiverSubmission, query: string): string[] 
         .replace(/([A-Z])/g, " $1")
         .toLowerCase();
 
-      if (label.includes(lowerQuery) || String(value).toLowerCase().includes(lowerQuery)) {
+      if (
+        label.includes(lowerQuery) ||
+        String(value).toLowerCase().includes(lowerQuery)
+      ) {
         matchingKeys.push(fieldId);
       }
     });
@@ -46,7 +55,9 @@ const getMatchingKeys = (submission: WaiverSubmission, query: string): string[] 
 
 const Submission = () => {
   const { templateId } = useParams();
-  const { waiverSubmissions } = useOutletContext<{ waiverSubmissions: WaiverSubmission[] }>();
+  const { waiverSubmissions } = useOutletContext<{
+    waiverSubmissions: WaiverSubmission[];
+  }>();
   const seed = useSeed();
   const [search, setSearch] = useState("");
   const isDesktop = useIsDesktop();
@@ -62,12 +73,13 @@ const Submission = () => {
   }, [search, waiverSubmissions, templateId]);
 
   const dataGridRows = filtered.map(({ submission }) => {
-  return submission.signers.reduce((acc, signer) => {
+    return submission.signers.reduce((acc, signer) => {
       return { ...acc, ...signer.fieldValues };
     }, {});
   });
-  
-  const title = seed.waiverTemplates?.[templateId!]?.title || "Unknown Template";
+
+  const title =
+    seed.waiverTemplates?.[templateId!]?.title || "Unknown Template";
 
   return (
     <div>
@@ -75,7 +87,9 @@ const Submission = () => {
         <h1 className="text-xl font-semibold mb-4">
           {title} Submissions
           <p className="text-red-500 text-sm">
-            {title === "Unknown Template" ? "Verify a title exists for this template" : ""}
+            {title === "Unknown Template"
+              ? "Verify a title exists for this template"
+              : ""}
           </p>
         </h1>
 
@@ -98,7 +112,11 @@ const Submission = () => {
             </div>
           ) : (
             filtered.map(({ submission, matchedKeys }, idx) => (
-              <SubmissionCard key={idx} submission={submission} highlightKeys={matchedKeys} />
+              <SubmissionCard
+                key={idx}
+                submission={submission}
+                highlightKeys={matchedKeys}
+              />
             ))
           )}
         </div>

@@ -11,5 +11,5 @@ export const gearRentalWaiverTemplate = {
     {{br}}
     Participant Signature: {{signature|font-size:40px;color:red}}
     {{br}}
-    `
-  }
+    `,
+};

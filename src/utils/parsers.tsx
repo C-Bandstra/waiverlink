@@ -9,7 +9,8 @@ type ParsedContent = (string | WaiverToken)[];
 export function parseWaiverTemplate(template: string): ParsedContent {
   // Match tokens of the form {{[signer-1]type:subtype|meta}} or variations
   // signerId is optional but, if present, wrapped in brackets immediately after {{
-  const regex = /{{(?:\[(signer-\d+)\])?(name|signature|date|input|checkbox|radio|dropdown|textarea|br)(?::([^|}]+))?(?:\|([^}]+))?}}/g;
+  const regex =
+    /{{(?:\[(signer-\d+)\])?(name|signature|date|input|checkbox|radio|dropdown|textarea|br)(?::([^|}]+))?(?:\|([^}]+))?}}/g;
 
   const chunks: ParsedContent = [];
   let lastIndex = 0;
@@ -86,8 +87,8 @@ export function parseWaiverTemplate(template: string): ParsedContent {
 function parseMeta(metaString: string): Record<string, string> {
   const meta: Record<string, string> = {};
 
-  metaString.split(';').forEach(pair => {
-    const [rawKey, rawValue] = pair.split(':');
+  metaString.split(";").forEach((pair) => {
+    const [rawKey, rawValue] = pair.split(":");
     const key = rawKey?.trim();
     const value = rawValue?.trim();
 
@@ -120,13 +121,13 @@ function parseMeta(metaString: string): Record<string, string> {
 // }
 
 function parseSubtype(subtypeRaw?: string | null): SubType | undefined {
-  if (!subtypeRaw) return undefined;  // return undefined instead of null
+  if (!subtypeRaw) return undefined; // return undefined instead of null
 
-  const [main, labelPart] = subtypeRaw.split(';');
-  const [fieldName, ...options] = main.split(':').map(str => str.trim());
+  const [main, labelPart] = subtypeRaw.split(";");
+  const [fieldName, ...options] = main.split(":").map((str) => str.trim());
 
   return {
-    fieldName: fieldName || null,  // fieldName can still be null if missing, that’s OK
+    fieldName: fieldName || null, // fieldName can still be null if missing, that’s OK
     options,
     label: labelPart?.trim() ?? null,
   };
@@ -143,7 +144,9 @@ export function parseFieldId(fieldId: string): WaiverToken {
   };
 }
 
-export function metaToInlineStyle(meta?: Record<string, string>): React.CSSProperties {
+export function metaToInlineStyle(
+  meta?: Record<string, string>,
+): React.CSSProperties {
   if (!meta) return {};
 
   const style: React.CSSProperties = {};
@@ -152,10 +155,12 @@ export function metaToInlineStyle(meta?: Record<string, string>): React.CSSPrope
     // Detect if the key is prefixed with "!" to mean "!important"
     // !!!! important DOES NOT work in inline styling. Extrapolate to element
     //  injection method which can use important keyword from token
-    const isImportant = key.startsWith('!');
+    const isImportant = key.startsWith("!");
     const cleanKey = isImportant ? key.slice(1) : key;
 
-    const camelKey = cleanKey.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+    const camelKey = cleanKey.replace(/-([a-z])/g, (_, char) =>
+      char.toUpperCase(),
+    );
 
     if (camelKey in document.body.style) {
       (style as any)[camelKey] = isImportant ? `${value} !important` : value;

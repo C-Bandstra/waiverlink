@@ -1,8 +1,8 @@
-import { seeds } from '../seed/seeds.ts';
-import React from 'react';
-import ReactDOMServer from 'react-dom/server';
+import { seeds } from "../seed/seeds.ts";
+import React from "react";
+import ReactDOMServer from "react-dom/server";
 // import parse from "html-react-parser";
-import type { Signer } from '../hooks/useSignerManager.tsx';
+import type { Signer } from "../hooks/useSignerManager.tsx";
 
 export function getSeedBySlug(slug: string = "") {
   const seed = seeds[slug];
@@ -11,7 +11,7 @@ export function getSeedBySlug(slug: string = "") {
 }
 
 export function getSeedFromHostOrParam(hostname: string, paramId?: string) {
-  const subdomain = hostname.split('.')[0];
+  const subdomain = hostname.split(".")[0];
   const seedId = paramId || subdomain;
 
   const seed = seeds[seedId];
@@ -24,19 +24,18 @@ export function reactElementToString(element: React.ReactNode): string {
   if (React.isValidElement(element)) {
     return ReactDOMServer.renderToStaticMarkup(element);
   }
-  return '';
+  return "";
 }
 
 export const buildSignatureElement = (name: string): React.ReactElement => {
   return <span className="signature">{name}</span>;
 };
 
-
 export function renderValue(value: unknown, type?: string): React.ReactNode {
   if (type === "signature" && typeof value === "string") {
-    console.log(value)
+    console.log(value);
     try {
-      return buildSignatureElement(value)
+      return buildSignatureElement(value);
     } catch {
       // fail silently, fallback to rendering raw string
     }
@@ -61,9 +60,9 @@ export function createSigner(signerIndex: number): Signer {
 export function toSlug(title: string): string {
   return title
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '') // remove non-word characters
+    .replace(/[^\w\s-]/g, "") // remove non-word characters
     .trim()
-    .replace(/\s+/g, '-') // replace spaces with dashes
+    .replace(/\s+/g, "-"); // replace spaces with dashes
 }
 
 export const waiverData = {
@@ -73,7 +72,7 @@ export const waiverData = {
       seedId: "never-summer",
       templateId: "demo",
       timestamp: "2025-05-28T00:36:28.099Z",
-      submittedBy: { 
+      submittedBy: {
         name: "Charlie Bandstra",
         signatureElement: "<p>Signature</p>",
         agreed: true, //waiverlink terms NOT business waiver terms
@@ -86,20 +85,20 @@ export const waiverData = {
         "date-birthDate": "2010-07-14",
         "input-guardian": "Josh Bandstra",
         "textarea-concerns": "High Blood Pressure",
-        "checkbox-agreeToTerms": "true"
+        "checkbox-agreeToTerms": "true",
       },
       touched: {
-        test: true
-      }
+        test: true,
+      },
     },
     {
       seedId: "never-summer",
       templateId: "demo",
       timestamp: "2025-05-28T00:36:28.099Z",
-      submittedBy: { 
+      submittedBy: {
         name: "Charlie Bandstra",
         signatureElement: "<p>Signature</p>",
-        agreed: true, //waiverlink terms NOT business waiver terms 
+        agreed: true, //waiverlink terms NOT business waiver terms
       },
       values: {
         "name-signeeName": "Charlie Bandstra",
@@ -108,18 +107,19 @@ export const waiverData = {
         "radio-shirtSize": "Small",
         "date-birthDate": "2010-07-14",
         "input-guardian": "Josh Bandstra",
-        "textarea-concerns": "High Blood Pressure testing a long concern just to see how the document responds to this Pressure testing a long concern just to see how the document responds to this",
-        "checkbox-agreeToTerms": "true"
+        "textarea-concerns":
+          "High Blood Pressure testing a long concern just to see how the document responds to this Pressure testing a long concern just to see how the document responds to this",
+        "checkbox-agreeToTerms": "true",
       },
       touched: {
-        test: true
-      }
+        test: true,
+      },
     },
     {
       seedId: "never-summer",
       templateId: "demo",
       timestamp: "2025-05-27T18:45:11.229Z",
-      submittedBy: { 
+      submittedBy: {
         name: "Alice Johnson",
         signatureElement: "<p>Signature</p>",
         agreed: true, //waiverlink terms NOT business waiver terms
@@ -132,17 +132,17 @@ export const waiverData = {
         "date-birthDate": "2012-03-10",
         "input-guardian": "Lara Johnson",
         "textarea-concerns": "None",
-        "checkbox-agreeToTerms": "true"
+        "checkbox-agreeToTerms": "true",
       },
       touched: {
-        test: true
-      }
+        test: true,
+      },
     },
     {
       seedId: "never-summer",
       templateId: "demo",
       timestamp: "2025-05-27T12:22:03.515Z",
-      submittedBy: { 
+      submittedBy: {
         name: "Bob Stone",
         signatureElement: "<p>Signature</p>",
         agreed: true, //waiverlink terms NOT business waiver terms
@@ -155,11 +155,11 @@ export const waiverData = {
         "date-birthDate": "2008-11-23",
         "input-guardian": "N/A",
         "textarea-concerns": "Asthma",
-        "checkbox-agreeToTerms": "false"
+        "checkbox-agreeToTerms": "false",
       },
       touched: {
-        test: true
-      }
-    }
-  ]
-}
+        test: true,
+      },
+    },
+  ],
+};

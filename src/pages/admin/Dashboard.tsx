@@ -2,7 +2,6 @@ import { Outlet } from "react-router-dom";
 import type { DashboardContext } from "../../types/admin";
 import { useOutletContext } from "react-router-dom";
 
-
 const Dashboard: React.FC = () => {
   const context = useOutletContext<DashboardContext>();
 

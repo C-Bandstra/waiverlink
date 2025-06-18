@@ -4,14 +4,13 @@ import DataGridCell from "./DataGridCell";
 
 // Main DataGrid Component
 const DataGrid = ({ data }: DataGridProps) => {
-  
   // Utility: Convert fieldId to readable column config
   const deriveColumns = (row: Record<string, any>): Column[] => {
     return Object.keys(row).map((fieldId) => {
       const { type, id, subtype } = parseFieldId(fieldId);
       const baseLabel = subtype?.fieldName ?? `${type}-${id}`;
       const readableLabel = baseLabel.replace(/([A-Z])/g, " $1").toLowerCase();
-      
+
       return {
         key: fieldId,
         label: readableLabel,
@@ -19,16 +18,15 @@ const DataGrid = ({ data }: DataGridProps) => {
         type,
       };
     });
-  }
-  
+  };
+
   const columns = deriveColumns(data[0] || {});
 
-    // Cell Renderer
+  // Cell Renderer
   const renderCell = (value: FirestoreValue, columnType: string) => {
     //can expand into RenderCell component at a later time
     return <DataGridCell value={value} type={columnType} />;
-  }
-
+  };
 
   return (
     <div
@@ -44,7 +42,11 @@ const DataGrid = ({ data }: DataGridProps) => {
         <thead className="bg-gray-100">
           <tr>
             {columns.map(({ key, label }) => (
-              <th key={key} className="p-2 border" style={{ whiteSpace: "nowrap" }}>
+              <th
+                key={key}
+                className="p-2 border"
+                style={{ whiteSpace: "nowrap" }}
+              >
                 {label}
               </th>
             ))}
@@ -54,7 +56,10 @@ const DataGrid = ({ data }: DataGridProps) => {
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="text-center p-4 text-gray-500">
+              <td
+                colSpan={columns.length}
+                className="text-center p-4 text-gray-500"
+              >
                 No matching submissions.
               </td>
             </tr>
@@ -77,6 +82,6 @@ const DataGrid = ({ data }: DataGridProps) => {
       </table>
     </div>
   );
-}
+};
 
 export default DataGrid;

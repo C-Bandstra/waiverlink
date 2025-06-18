@@ -146,7 +146,6 @@ export function useSignerManager() {
     }
   };
 
-
   /**
    * Go back to the previous signer in the list,
    * if available, and load their data
@@ -172,4 +171,3 @@ export function useSignerManager() {
     expandSignerList,
   };
 }
-

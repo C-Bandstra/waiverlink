@@ -20,10 +20,16 @@ interface SignerContextType {
 const SignerContext = createContext<SignerContextType | undefined>(undefined);
 
 // Provider component wraps app and provides the signer state
-export const SignerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SignerProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const signerManager = useSignerManager();
 
-  return <SignerContext.Provider value={signerManager}>{children}</SignerContext.Provider>;
+  return (
+    <SignerContext.Provider value={signerManager}>
+      {children}
+    </SignerContext.Provider>
+  );
 };
 
 // Hook to consume the context easily
