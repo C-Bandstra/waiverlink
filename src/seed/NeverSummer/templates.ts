@@ -29,9 +29,9 @@ export const demoWaiverTemplate = {
     {{br}}
     Date: {{date:current}}
     {{br}}
-    `
-  }
-  // {{checkbox:agreeToTerms:I have read and agree to the terms of this waiver and voluntarily participate in Never Summer activities.}}
+    `,
+};
+// {{checkbox:agreeToTerms:I have read and agree to the terms of this waiver and voluntarily participate in Never Summer activities.}}
 
 export const adminWaiverTemplate = {
   id: "admin",
@@ -65,8 +65,8 @@ export const adminWaiverTemplate = {
     Date: {{date:current}}
     {{br}}
     {{checkbox:agreeToTerms:I have read and agree to the terms of this waiver and voluntarily participate in Never Summer activities.}}
-  `
-}
+  `,
+};
 
 export const multiSignerTemplate = {
   id: "multi-signer",
@@ -100,5 +100,5 @@ export const multiSignerTemplate = {
     Signature: {{[signer-3]signature:signer3;Guardian Signature}}
     {{br}}
     Date: {{[signer-3]date:signer-3:current}}
-  `
-}
+  `,
+};

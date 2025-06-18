@@ -11,10 +11,13 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({
 }) => {
   const { signers, timestamp } = submission;
 
-  const [expandedSignerIds, setExpandedSignerIds] = useState<Record<string, boolean>>({});
+  const [expandedSignerIds, setExpandedSignerIds] = useState(
+    {} as Record<string, boolean>,
+  );
   const [showImage, setShowImage] = useState(false);
 
-  const date = timestamp instanceof Timestamp ? timestamp.toDate() : new Date(timestamp);
+  const date =
+    timestamp instanceof Timestamp ? timestamp.toDate() : new Date(timestamp);
 
   useEffect(() => {
     const checkWidth = () => {
@@ -26,7 +29,7 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({
   }, []);
 
   // Function to get sorted entries per signer
-  const getOrderedEntries = (signer: typeof signers[number]) => {
+  const getOrderedEntries = (signer: (typeof signers)[number]) => {
     const entries = Object.entries(signer.fieldValues);
     const prioritized = highlightKeys
       .map((key) => entries.find(([entryKey]) => entryKey === key))
@@ -40,7 +43,9 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({
       {signers.map((signer, index) => {
         const orderedEntries = getOrderedEntries(signer);
         const isExpanded = expandedSignerIds[signer.id] ?? false;
-        const visibleEntries = isExpanded ? orderedEntries : orderedEntries.slice(0, 3);
+        const visibleEntries = isExpanded
+          ? orderedEntries
+          : orderedEntries.slice(0, 3);
 
         const toggleExpand = () => {
           setExpandedSignerIds((prev) => ({
@@ -52,13 +57,19 @@ const SubmissionCard: React.FC<SubmissionCardProps> = ({
         return (
           <div key={signer.id} className="flex justify-between items-start">
             <div className="flex-1 min-w-0">
-              <div className="mb-2 text-lg font-semibold text-gray-800">{signer.name}</div>
-              <div className="text-sm text-gray-500 mb-3">{date.toLocaleString()}</div>
+              <div className="mb-2 text-lg font-semibold text-gray-800">
+                {signer.name}
+              </div>
+              <div className="text-sm text-gray-500 mb-3">
+                {date.toLocaleString()}
+              </div>
               <div className="space-y-1">
                 {visibleEntries.map(([fieldId, value]) => {
                   const { subtype, type, id } = parseFieldId(fieldId);
                   const baseLabel = subtype?.fieldName ?? `${type}-${id}`;
-                  const readableLabel = baseLabel.replace(/([A-Z])/g, " $1").toLowerCase();
+                  const readableLabel = baseLabel
+                    .replace(/([A-Z])/g, " $1")
+                    .toLowerCase();
 
                   return (
                     <div key={fieldId} className="text-sm text-gray-700">

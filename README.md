@@ -1,6 +1,6 @@
 # waiverlink
 
-*waiverlink* is a flexible and modular digital waiver platform built for businesses still using paper-based waivers, forms, or simple signature documents.
+_waiverlink_ is a flexible and modular digital waiver platform built for businesses still using paper-based waivers, forms, or simple signature documents.
 The system is designed to be frictionless for guests, easy to manage for staff, and deeply extensible for tracking, analytics, and potential customer conversion.
 
 ## Goals
@@ -49,3 +49,4 @@ git clone https://github.com/yourusername/waiverlink.git
 cd waiverlink
 npm install
 npm run dev
+```

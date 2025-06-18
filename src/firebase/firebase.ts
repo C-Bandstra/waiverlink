@@ -42,10 +42,10 @@ const db = getFirestore(app);
 //   });
 // });
 
-export { 
+export {
   // auth,
-  db, 
-  // authReady 
+  db,
+  // authReady
 };
 // USAGE IN COMPONENT OR UTILITY FILE
 // --------------------------------------------------------
@@ -56,4 +56,3 @@ export {
 //   console.log("Do something with:", user.uid);
 //   // Use db to read/write to Firestore with this UID
 // }
-

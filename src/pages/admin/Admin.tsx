@@ -6,15 +6,25 @@ import type { WaiverSubmission } from "../../types/admin";
 import { toSlug } from "../../utils/helpers";
 
 const Admin: React.FC = () => {
-  const [waiverSubmissions, setWaiverSubmissions] = useState<WaiverSubmission[]>([]);
-  const [selectedTemplateTitle, setSelectedTemplateTitle] = useState<string | null>(null);
+  const [waiverSubmissions, setWaiverSubmissions] = useState(
+    [] as WaiverSubmission[],
+  );
+  const [selectedTemplateTitle, setSelectedTemplateTitle] = useState(
+    null as string | null,
+  );
+
   const seed = useSeed();
 
   useEffect(() => {
     if (!selectedTemplateTitle) return;
     const selectedTemplateSlug = toSlug(selectedTemplateTitle);
 
-    const unsub = listenToSubmissions(seed.id, "waivers", selectedTemplateSlug, setWaiverSubmissions);
+    const unsub = listenToSubmissions(
+      seed.id,
+      "waivers",
+      selectedTemplateSlug,
+      setWaiverSubmissions,
+    );
     return () => unsub?.();
   }, [seed.id, selectedTemplateTitle]);
 

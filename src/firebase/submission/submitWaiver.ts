@@ -11,7 +11,7 @@ export async function submitWaiver(
   seedId: string,
   groupingId: string,
   templateTitle: string,
-  submission: WaiverSubmission
+  submission: WaiverSubmission,
 ): Promise<string> {
   try {
     const templateSlug = toSlug(templateTitle); // => "multi-signer-waiver"
@@ -27,7 +27,7 @@ export async function submitWaiver(
       seedId,
       groupingId,
       templateSlug,
-      "submissions"
+      "submissions",
     );
 
     const docRef = await addDoc(submissionsRef, submissionToSave);

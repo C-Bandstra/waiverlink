@@ -12,7 +12,6 @@ const MAX_LENGTH = 50;
 const DataGridCell: React.FC<DataGridCellProps> = ({ value, type }) => {
   const [expanded, setExpanded] = useState(false);
 
-
   // Use renderValue utility to get either parsed React element or clean string
   const rendered = renderValue(value, type);
 
@@ -23,7 +22,6 @@ const DataGridCell: React.FC<DataGridCellProps> = ({ value, type }) => {
 
   // Otherwise, treat it as a string and apply truncation logic
   const text = String(rendered ?? "");
-
 
   if (text.length <= MAX_LENGTH) {
     return <>{text}</>;

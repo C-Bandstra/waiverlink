@@ -8,7 +8,7 @@ const Header: React.FC = () => {
   const seed = useSeed();
 
   const isOnAdminPage = location.pathname.includes(`admin/${seed.id}`);
-  
+
   return (
     <header className="w-full p-2 border-b border-gray-200 bg-white flex justify-between">
       <div className="flex items-center">

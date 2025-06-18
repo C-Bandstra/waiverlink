@@ -1,6 +1,6 @@
 import { useReducer, useState } from "react";
 import type { JSX } from "react";
-import type { WaiverToken } from "../types";
+import type { TokenChunk } from "../components/WaiverRenderer";
 
 export interface Signer {
   id: string; // e.g. "signer-1"
@@ -9,7 +9,7 @@ export interface Signer {
   agreedToTerms: boolean;
   touched: Record<string, boolean>;
   fieldValues: Record<string, any>;
-  requiredFields: WaiverToken[];
+  requiredFields: TokenChunk[];
 }
 
 // --- Utility to create a blank signer with given index ---
@@ -146,7 +146,6 @@ export function useSignerManager() {
     }
   };
 
-
   /**
    * Go back to the previous signer in the list,
    * if available, and load their data
@@ -172,4 +171,3 @@ export function useSignerManager() {
     expandSignerList,
   };
 }
-

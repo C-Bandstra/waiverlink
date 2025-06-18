@@ -1,58 +1,63 @@
 import React, { useEffect, useState } from "react";
-import type { FC, FormEvent } from 'react';
-import WaiverRenderer from '../../components/WaiverRenderer';
-import { parseWaiverTemplate } from '../../utils/parsers';
-import { useSeed } from '../../context/SeedContext';
+import type { FC, FormEvent } from "react";
+import WaiverRenderer from "../../components/WaiverRenderer";
+import { parseWaiverTemplate } from "../../utils/parsers";
+import { useSeed } from "../../context/SeedContext";
 // import type { WaiverProps } from '../../types';
-import { useParams } from 'react-router-dom';
-import ErrorMessage from '../../components/ErrorMessage';
-import type { WaiverSubmission } from '../../types/admin';
-import { submitWaiver } from '../../firebase/submission/submitWaiver';
-import { reactElementToString } from '../../utils/helpers';
-import SignerSelector from '../../components/SignerSelector';
+import { useParams } from "react-router-dom";
+import ErrorMessage from "../../components/ErrorMessage";
+import type { WaiverSubmission } from "../../types/admin";
+import { submitWaiver } from "../../firebase/submission/submitWaiver";
+import { reactElementToString } from "../../utils/helpers";
+import SignerSelector from "../../components/SignerSelector";
 import { useSigner } from "../../context/SignerContext";
+import { buildSignatureElement } from "../../utils/helpers";
 
 const Waiver: FC = () => {
   const { waiverId } = useParams();
   const seed = useSeed();
-  
+
   if (!waiverId) return <ErrorMessage message="Waiver ID is required." />;
 
-  const waiverTemplate = seed.waiverTemplates[waiverId as keyof typeof seed.waiverTemplates];
+  const waiverTemplate =
+    seed.waiverTemplates[waiverId as keyof typeof seed.waiverTemplates];
   if (!waiverTemplate) return <div>Template not found</div>;
 
   const [isMultiSigner, setIsMultiSigner] = useState(false);
   const [numSignees, setNumSignees] = useState(1);
 
   const {
-    signer,               //Current active signer
-    update,               //To update current signer state partially
+    signer, //Current active signer
+    update, //To update current signer state partially
     // reset,
-    save,                 //to save current signer to the saved signer list
+    save, //to save current signer to the saved signer list
     // load,              //to load a saved signer into current state
     nextSigner,
     // previousSigner,
     // expandSignerList,  //Expand the signer list up to the given count,
-    signerList,           //Array of saved signer snapshots
+    signerList, //Array of saved signer snapshots
     currentSignerIndex,
   } = useSigner(); // via context
 
-   useEffect(() => {
+  useEffect(() => {
     console.log("Current signer:", signer, currentSignerIndex);
     console.log("Current signer list:", signerList);
-   }, [signer, signerList])
+  }, [signer, signerList]);
 
   const onFieldInteract = (_fieldName: string, fieldId: string) => {
     console.log("FIELD ID: ", fieldId);
     update({
       touched: {
-        ...signer.touched,      // keep existing touched keys
-        [fieldId]: true,       // mark this field as touched
+        ...signer.touched, // keep existing touched keys
+        [fieldId]: true, // mark this field as touched
       },
     });
   };
 
-  const onFieldValueChange = (fieldId: string, value: string | React.ReactNode) => {
+  const onFieldValueChange = (
+    fieldId: string,
+    value: string | React.ReactNode,
+  ) => {
     update({
       fieldValues: {
         ...signer.fieldValues,
@@ -87,14 +92,14 @@ const Waiver: FC = () => {
         Object.entries(s.fieldValues || {}).forEach(([key, value]) => {
           if (value instanceof Date) {
             serializedFields[key] = value;
-          } else if (typeof value === 'boolean' || typeof value === 'string') {
+          } else if (typeof value === "boolean" || typeof value === "string") {
             serializedFields[key] = value;
           } else if (reactElementToString(value)) {
             serializedFields[key] = reactElementToString(value);
           } else if (value === null || value === undefined) {
             serializedFields[key] = null;
           } else {
-            serializedFields[key] = '';
+            serializedFields[key] = "";
           }
         });
 
@@ -115,13 +120,13 @@ const Waiver: FC = () => {
         signers: serializedSignerList,
       };
 
-      console.log('Waiver to be submitted:', waiverSubmission);
+      console.log("Waiver to be submitted:", waiverSubmission);
 
       const submissionId = await submitWaiver(
         seed.id,
         waiverTemplate.groupingId, // e.g., "waivers"
-        waiverTemplate.title,      // e.g., "Multi Signer Waiver"
-        waiverSubmission
+        waiverTemplate.title, // e.g., "Multi Signer Waiver"
+        waiverSubmission,
       );
 
       console.log("Successfully submitted:", submissionId);
@@ -129,13 +134,10 @@ const Waiver: FC = () => {
       console.error("Save or submission failed:", err);
     }
   };
-  
-  const buildSignatureElement = (name: string): React.ReactElement => {
-    return <span className="signature">{name}</span>
-  };
 
   const allFieldsComplete = () => {
-    if (!signer.requiredFields || signer.requiredFields.length === 0) return true;
+    if (!signer.requiredFields || signer.requiredFields.length === 0)
+      return true;
 
     const missingFields: string[] = [];
 
@@ -144,11 +146,11 @@ const Waiver: FC = () => {
       const fieldName = subtype?.fieldName;
 
       // Handle 'name' type specifically
-      if (type === 'name') {
+      if (type === "name") {
         const signerIndex = signerId?.match(/-(\d+)$/)?.[1];
-        const key = signerIndex ? `name-${signerIndex}` : 'name';
+        const key = signerIndex ? `name-${signerIndex}` : "name";
         const value = signer.fieldValues?.[key];
-        const isValid = typeof value === 'string' && value.trim().length > 0;
+        const isValid = typeof value === "string" && value.trim().length > 0;
 
         if (!isValid) missingFields.push(key);
         return isValid;
@@ -162,11 +164,11 @@ const Waiver: FC = () => {
 
       let key: string;
 
-      if (type === 'signature') {
+      if (type === "signature") {
         key = `signature-${fieldName}`;
-      } else if (type === 'date') {
+      } else if (type === "date") {
         key = `date-${fieldName}`;
-      } else if (type === 'input') {
+      } else if (type === "input") {
         key = `input-${fieldName}`;
       } else {
         key = fieldName;
@@ -177,9 +179,9 @@ const Waiver: FC = () => {
 
       if (value === null || value === undefined) {
         isValid = false;
-      } else if (typeof value === 'string') {
+      } else if (typeof value === "string") {
         isValid = value.trim().length > 0;
-      } else if (typeof value === 'boolean') {
+      } else if (typeof value === "boolean") {
         isValid = value === true;
       } else if (value instanceof Date) {
         isValid = !isNaN(value.getTime());
@@ -190,32 +192,36 @@ const Waiver: FC = () => {
     });
 
     if (missingFields.length > 0) {
-      console.warn('Missing required fields:', missingFields);
+      console.warn("Missing required fields:", missingFields);
     }
 
     return complete;
   };
 
+  // && allFieldsComplete && otherRequirments
+  // Current signer is done
+  const isSignerComplete =
+    signer.name && signer.agreedToTerms && allFieldsComplete();
 
-    // && allFieldsComplete && otherRequirments 
-    // Current signer is done
-    const isSignerComplete = signer.name && signer.agreedToTerms && allFieldsComplete();
+  // Check if this is the last signer
+  const isLastSigner = currentSignerIndex === numSignees - 1;
 
-    // Check if this is the last signer
-    const isLastSigner = currentSignerIndex === numSignees - 1;
+  // Not last signer, but ready to pass
+  const shouldPassSigning = !isLastSigner && isSignerComplete;
 
-    // Not last signer, but ready to pass
-    const shouldPassSigning = !isLastSigner && isSignerComplete;
+  // Button disabled if signer isn't done
+  const isButtonDisabled = !isSignerComplete;
 
-    // Button disabled if signer isn't done
-    const isButtonDisabled = !isSignerComplete;
+  // Button label changes on last signer
+  const buttonLabel = isSignerComplete
+    ? isLastSigner
+      ? "Complete"
+      : "Pass to next Signer"
+    : isLastSigner
+      ? "Complete (incomplete)"
+      : "Pass (incomplete)";
 
-    // Button label changes on last signer
-    const buttonLabel = isSignerComplete
-    ? (isLastSigner ? "Complete" : "Pass to next Signer")
-    : (isLastSigner ? "Complete (incomplete)" : "Pass (incomplete)");
-
-    console.log({
+  console.log({
     signerName: signer.name,
     agreedToTerms: signer.agreedToTerms,
     allFieldsComplete: allFieldsComplete(),
@@ -223,17 +229,20 @@ const Waiver: FC = () => {
     currentSignerIndex,
     numSignees,
   });
-                                          
+
   return (
     <div className="w-full max-w-screen-sm sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-md xl:max-w-screen-lg mx-auto p-2">
       <div className="flex items-center content-center w-full">
-        <img src={seed.image} className="bg-black p-2 mb-2"/>
+        <img src={seed.image} className="bg-black p-2 mb-2" />
         <h1 className="text-2xl font-semibold mb-4 hidden">{seed.name}</h1>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 text-left">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 text-left"
+            >
               Full Name:
             </label>
             <input
@@ -260,7 +269,7 @@ const Waiver: FC = () => {
                   }}
                   className="inline-block min-w-[150px] cursor-pointer"
                 >
-                  {signer.signature || 'Create Signature'}
+                  {signer.signature || "Create Signature"}
                 </span>
               </div>
             </div>
@@ -275,8 +284,10 @@ const Waiver: FC = () => {
             setNumSignees={setNumSignees}
           />
         </>
-                
-        <h2 className="text-2xl font-semibold mb-4 text-left underline">{waiverTemplate.title}</h2>
+
+        <h2 className="text-2xl font-semibold mb-4 text-left underline">
+          {waiverTemplate.title}
+        </h2>
         {signer.name && signer.signature ? (
           <div className="my-6 border border-black p-4">
             <WaiverRenderer
@@ -304,7 +315,8 @@ const Waiver: FC = () => {
               className="mt-1"
             />
             <label htmlFor="agree" className="text-sm text-gray-700">
-              I agree to the waiverlink terms and consent to sign electronically.
+              I agree to the waiverlink terms and consent to sign
+              electronically.
             </label>
           </div>
         )}
@@ -312,7 +324,9 @@ const Waiver: FC = () => {
           type="submit"
           disabled={isButtonDisabled}
           className={`w-full py-2 px-4 rounded-md text-white ${
-            !isButtonDisabled ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'
+            !isButtonDisabled
+              ? "bg-blue-600 hover:bg-blue-700"
+              : "bg-gray-400 cursor-not-allowed"
           }`}
         >
           {buttonLabel}

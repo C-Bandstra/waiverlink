@@ -6,7 +6,7 @@ import type { AppRoute } from "../types";
 
 const adminRoutes: AppRoute[] = [
   {
-    path: "",              // root of admin, acts like index here
+    path: "", // root of admin, acts like index here
     component: Admin,
     children: [
       {
@@ -14,7 +14,7 @@ const adminRoutes: AppRoute[] = [
         component: Dashboard,
         children: [
           {
-            path: "",      // this is the "index" route of dashboard
+            path: "", // this is the "index" route of dashboard
             component: SubmissionSelector,
           },
           {
