@@ -11,6 +11,7 @@ import { submitWaiver } from '../../firebase/submission/submitWaiver';
 import { reactElementToString } from '../../utils/helpers';
 import SignerSelector from '../../components/SignerSelector';
 import { useSigner } from "../../context/SignerContext";
+import { buildSignatureElement } from "../../utils/helpers";
 
 const Waiver: FC = () => {
   const { waiverId } = useParams();
@@ -130,10 +131,6 @@ const Waiver: FC = () => {
     }
   };
   
-  const buildSignatureElement = (name: string): React.ReactElement => {
-    return <span className="signature">{name}</span>
-  };
-
   const allFieldsComplete = () => {
     if (!signer.requiredFields || signer.requiredFields.length === 0) return true;
 
