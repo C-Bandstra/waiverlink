@@ -53,9 +53,9 @@ const WaiverRenderer = ({
   // Track which fields have been interacted with
   const [interactions, setInteractions] = useState<Record<string, boolean>>({});
 
-  // Local state for current signer input values (in-progress)
+  // State being listened to by Waiver
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
-  const [dateValues, setDateValues] = useState<Record<string, string>>({}); // For date fields
+  const [dateValues, setDateValues] = useState<Record<string, string>>({});
 
   const currentDate = new Date().toISOString().split("T")[0];
 
@@ -69,12 +69,10 @@ const WaiverRenderer = ({
         onFieldInteract(type, fieldId);
 
         // Prefill logic on first interaction (name, date:current, signature)
-        if (type === "name") {
+        if (type === "name" || type === "signature") {
           onFieldValueChange(fieldId, name);
         } else if (type === "date" && subtype?.fieldName) {
           onFieldValueChange(fieldId, currentDate);
-        } else if (type === "signature") {
-          onFieldValueChange(fieldId, name);
         }
         // Other types handled by user input events
       }
@@ -89,19 +87,13 @@ const WaiverRenderer = ({
     ],
   );
 
-  // Handle date field changes
-  const setDateValue = useCallback(
-    (fieldId: string, val: string) => {
-      setDateValues((prev) => ({ ...prev, [fieldId]: val }));
-      onFieldValueChange(fieldId, val);
-    },
-    [onFieldValueChange],
-  );
-
-  // Handle generic input-like fields change
-  const setInputValue = useCallback(
-    (fieldId: string, val: string) => {
-      setInputValues((prev) => ({ ...prev, [fieldId]: val }));
+  const setFieldValue = useCallback(
+    (
+      fieldId: string,
+      val: string,
+      setState: React.Dispatch<React.SetStateAction<Record<string, string>>>,
+    ) => {
+      setState((prev) => ({ ...prev, [fieldId]: val }));
       onFieldValueChange(fieldId, val);
     },
     [onFieldValueChange],
@@ -119,6 +111,7 @@ const WaiverRenderer = ({
     fieldId: string,
     fieldSignerId?: string, // who owns the field
   ): T | undefined {
+    // Default to current signer if no explicit owner is set
     if (!fieldSignerId) {
       fieldSignerId = currentSignerId;
     }
@@ -193,7 +186,8 @@ const WaiverRenderer = ({
             fieldName === "current"
               ? currentDate
               : resolveValue(dateValues[fieldId], signer.id, fieldId) || "";
-          setValue = (val: string) => setDateValue(fieldId, val);
+          setValue = (val: string) =>
+            setFieldValue(fieldId, val, setDateValues);
           break;
         }
         case "input":
@@ -202,7 +196,8 @@ const WaiverRenderer = ({
         case "dropdown":
         case "textarea": {
           value = resolveValue(inputValues[fieldId], signer.id, fieldId) || "";
-          setValue = (val: string) => setInputValue(fieldId, val);
+          setValue = (val: string) =>
+            setFieldValue(fieldId, val, setInputValues);
           break;
         }
         case "name": {
