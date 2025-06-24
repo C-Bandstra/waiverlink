@@ -29,8 +29,7 @@ const Admin: React.FC = () => {
   }, [seed.id, selectedTemplateTitle]);
 
   return (
-    <>
-      <p>Admin</p>
+    <div className="flex flex-col flex-grow overflow-hidden border border-red-600 p-2">
       <Outlet
         context={{
           waiverSubmissions,
@@ -38,7 +37,7 @@ const Admin: React.FC = () => {
           selectedTemplateTitle,
         }}
       />
-    </>
+    </div>
   );
 };
 

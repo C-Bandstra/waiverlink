@@ -16,7 +16,7 @@ const Header: React.FC = () => {
       </div>
       <button
         onClick={() => navigate(`/admin/${seed.id}/dashboard`)}
-        className="border-[2px] border-black rounded-sm text-black font-bold p-2 transition-transform duration-300 transform hover:scale-110 will-change-transform"
+        className="border-[2px] border-black rounded-sm text-black font-bold p-2 px-3 transition-transform duration-300 transform hover:scale-110 will-change-transform"
       >
         {isOnAdminPage ? "manage" : "admin"}
       </button>

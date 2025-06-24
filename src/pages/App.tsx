@@ -20,10 +20,19 @@ const SeedLayout = () => {
   return (
     <SeedProvider seed={seed}>
       <SignerProvider>
-        <Header />
-        <PageContainer>
-          <Outlet />
-        </PageContainer>
+        <div className="flex flex-col h-screen overflow-hidden">
+          {/* Sticky-style Header */}
+          <div className="sticky bg-gray border-b-[2px] border-gray-400 px-2">
+            <Header />
+          </div>
+
+          {/* Scrollable content area */}
+          <div className="flex-1 overflow-auto">
+            <PageContainer>
+              <Outlet />
+            </PageContainer>
+          </div>
+        </div>
       </SignerProvider>
     </SeedProvider>
   );
