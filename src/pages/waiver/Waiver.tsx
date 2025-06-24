@@ -135,6 +135,14 @@ const Waiver: FC = () => {
     }
   };
 
+  const isFieldValueValid = (value: any): boolean => {
+    if (value === null || value === undefined) return false;
+    if (typeof value === "string") return value.trim().length > 0;
+    if (typeof value === "boolean") return value;
+    if (value instanceof Date) return !isNaN(value.getTime());
+    return true;
+  };
+
   const allFieldsComplete = () => {
     if (!signer.requiredFields || signer.requiredFields.length === 0)
       return true;
@@ -175,17 +183,7 @@ const Waiver: FC = () => {
       }
 
       const value = signer.fieldValues?.[key];
-      let isValid = true;
-
-      if (value === null || value === undefined) {
-        isValid = false;
-      } else if (typeof value === "string") {
-        isValid = value.trim().length > 0;
-      } else if (typeof value === "boolean") {
-        isValid = value === true;
-      } else if (value instanceof Date) {
-        isValid = !isNaN(value.getTime());
-      }
+      const isValid = isFieldValueValid(value);
 
       if (!isValid) missingFields.push(key);
       return isValid;
