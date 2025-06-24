@@ -32,25 +32,20 @@ const getMatchingKeys = (
   const lowerQuery = query.toLowerCase().trim();
   if (!lowerQuery) return [];
 
-  const matchingKeys: string[] = [];
-
-  submission.signers.forEach((signer) => {
-    Object.entries(signer.fieldValues).forEach(([fieldId, value]) => {
-      const { type, id, subtype } = parseFieldId(fieldId);
-      const label = (subtype?.fieldName ?? `${type}-${id}`)
-        .replace(/([A-Z])/g, " $1")
-        .toLowerCase();
-
-      if (
-        label.includes(lowerQuery) ||
-        String(value).toLowerCase().includes(lowerQuery)
-      ) {
-        matchingKeys.push(fieldId);
-      }
-    });
-  });
-
-  return matchingKeys;
+  return submission.signers.flatMap((signer) =>
+    Object.entries(signer.fieldValues)
+      .filter(([fieldId, value]) => {
+        const { type, id, subtype } = parseFieldId(fieldId);
+        const label = (subtype?.fieldName ?? `${type}-${id}`)
+          .replace(/([A-Z])/g, " $1")
+          .toLowerCase();
+        return (
+          label.includes(lowerQuery) ||
+          String(value).toLowerCase().includes(lowerQuery)
+        );
+      })
+      .map(([fieldId]) => fieldId),
+  );
 };
 
 const Submission = () => {
