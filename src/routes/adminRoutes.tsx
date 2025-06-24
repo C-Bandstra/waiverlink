@@ -2,6 +2,7 @@ import Admin from "../pages/admin/Admin";
 import Dashboard from "../pages/admin/Dashboard";
 import SubmissionSelector from "../pages/admin/SubmissionSelector";
 import Submission from "../pages/admin/Submission";
+import TemplateBuilder from "../pages/admin/TemplateBuilder";
 import type { AppRoute } from "../types";
 
 const adminRoutes: AppRoute[] = [
@@ -22,6 +23,11 @@ const adminRoutes: AppRoute[] = [
             component: Submission,
           },
         ],
+      },
+      {
+        path: "template-builder",
+        component: TemplateBuilder,
+        children: [],
       },
     ],
   },
