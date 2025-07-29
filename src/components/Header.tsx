@@ -14,12 +14,22 @@ const Header: React.FC = () => {
       <div className="flex items-center">
         <h1 className="text-xl font-bold text-gray-900">waiverlink</h1>
       </div>
-      <button
-        onClick={() => navigate(`/admin/${seed.id}/dashboard`)}
-        className="border-[2px] border-black rounded-sm text-black font-bold p-2 px-3 transition-transform duration-300 transform hover:scale-110 will-change-transform"
-      >
-        {isOnAdminPage ? "manage" : "admin"}
-      </button>
+      <div>
+        <button
+          onClick={() => navigate(`/admin/${seed.id}/dashboard`)}
+          className="border-[2px] border-black rounded-sm text-black font-bold p-2 px-3 transition-transform duration-300 transform hover:scale-110 will-change-transform"
+        >
+          {isOnAdminPage ? "dashboard" : "admin"}
+        </button>
+        {isOnAdminPage && (
+          <button
+            onClick={() => navigate(`/admin/${seed.id}/template-builder`)}
+            className="ml-3 border-[2px] border-black rounded-sm text-black font-bold p-2 px-3 transition-transform duration-300 transform hover:scale-110 will-change-transform"
+          >
+            template builder
+          </button>
+        )}
+      </div>
     </header>
   );
 };
