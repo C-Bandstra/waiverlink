@@ -137,6 +137,8 @@ const TemplateBuilder = () => {
     "dropdown",
   ];
 
+  console.log("testing template builder")
+
   return (
     <div className="flex flex-col md:flex-row flex-grow overflow-hidden">
       {/* Left Nav */}
