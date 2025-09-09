@@ -7,7 +7,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="p-4 border-2 border-black">
-      Dashboard
+      <h1 className="text-xl font-bold">Dashboard</h1>
       <Outlet context={context} />
     </div>
   );

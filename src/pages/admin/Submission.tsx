@@ -5,6 +5,7 @@ import { useSeed } from "../../context/SeedContext";
 import { parseFieldId } from "../../utils/parsers";
 import DataGrid from "../../components/grid/DataGrid";
 import SubmissionCard from "../../components/SubmissionCard";
+import { useNavigate } from "react-router-dom";
 
 const MIN_DESKTOP_WIDTH = 821;
 
@@ -49,6 +50,7 @@ const getMatchingKeys = (
 };
 
 const Submission = () => {
+  const navigate = useNavigate();
   const { templateId } = useParams();
   const { waiverSubmissions } = useOutletContext<{
     waiverSubmissions: WaiverSubmission[];
@@ -79,6 +81,12 @@ const Submission = () => {
   return (
     <div>
       <div className="w-fit">
+        <button
+          onClick={() => navigate(`/${seed.id}/waiver/${templateId}`)}
+          className="border-[2px] border-black rounded-sm text-black font-bold p-1 px-2 transition-transform duration-300 transform hover:scale-110 will-change-transform"
+        >
+          view template
+        </button>
         <h1 className="text-xl font-semibold mb-4">
           {title} Submissions
           <p className="text-red-500 text-sm">
@@ -87,7 +95,6 @@ const Submission = () => {
               : ""}
           </p>
         </h1>
-
         <input
           type="text"
           placeholder="Search by field or value..."
